@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Logistics-L3mon.iml" filepath="$PROJECT_DIR$/.idea/Logistics-L3mon.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Logistic-Rest-API.iml" filepath="$PROJECT_DIR$/.idea/Logistic-Rest-API.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Logistics-L3mon/Logistics-L3mon.iml" filepath="$PROJECT_DIR$/Logistics-L3mon/Logistics-L3mon.iml" />
     </modules>
   </component>
 </project>

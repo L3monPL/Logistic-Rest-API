@@ -30,11 +30,11 @@ public class UserConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf().disable()
-                .authorizeHttpRequests()
-                .requestMatchers("/api/v1/auth/register","/api/v1/auth/login","/api/v1/auth/validate","/api/v1/auth/reset-password","/api/v1/auth/activate","/api/v1/auth/logout","/api/v1/auth/auto-login","/api/v1/auth/logged-in","/api/v1/auth/authorize").permitAll()
-                .and()
-                .build();
+        return http.csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v1/auth/*").permitAll()
+                        .anyRequest().authenticated()
+                ).build();
     }
 
 

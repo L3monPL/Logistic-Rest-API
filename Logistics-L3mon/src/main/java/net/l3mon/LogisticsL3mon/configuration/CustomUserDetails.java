@@ -1,14 +1,18 @@
 package net.l3mon.LogisticsL3mon.configuration;
 
+import net.l3mon.LogisticsL3mon.entity.Role;
 import net.l3mon.LogisticsL3mon.entity.User;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 
 public class CustomUserDetails implements UserDetails {
     private String username;
     private String password;
+    private Role role;
 
     public CustomUserDetails(User user){
         this.username = user.getUsername();
@@ -16,7 +20,7 @@ public class CustomUserDetails implements UserDetails {
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override

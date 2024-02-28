@@ -10,6 +10,8 @@ import net.l3mon.LogisticsL3mon.entity.AuthResponse;
 import net.l3mon.LogisticsL3mon.entity.Code;
 import net.l3mon.LogisticsL3mon.entity.Role;
 import net.l3mon.LogisticsL3mon.entity.User;
+import net.l3mon.LogisticsL3mon.exceptions.UserExistingWithMail;
+import net.l3mon.LogisticsL3mon.exceptions.UserExistingWithName;
 import net.l3mon.LogisticsL3mon.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -48,11 +50,11 @@ public class UserService {
     }
 
 
-    public void validateToken(HttpServletRequest request) throws ExpiredJwtException, IllegalArgumentException{
+    public void validateToken(HttpServletRequest request, HttpServletResponse response) throws ExpiredJwtException, IllegalArgumentException{
         String token = null;
         String refresh = null;
         for (Cookie value : Arrays.stream(request.getCookies()).toList()) {
-            if (value.getName().equals("token")) {
+            if (value.getName().equals("Authorization")) {
                 token = value.getValue();
             } else if (value.getName().equals("refresh")) {
                 refresh = value.getValue();
@@ -62,21 +64,29 @@ public class UserService {
             jwtService.validateToken(token);
         }catch (IllegalArgumentException | ExpiredJwtException e){
             jwtService.validateToken(refresh);
+            Cookie refreshCookie = cookiService.generateCookie("refresh", jwtService.refreshToken(refresh, refreshExp), refreshExp);
+            Cookie cookie = cookiService.generateCookie("Authorization", jwtService.refreshToken(refresh, exp), exp);
+            response.addCookie(cookie);
+            response.addCookie(refreshCookie);
         }
 
     }
 
 
-    public void register(UserRegisterDTO userRegisterDTO) {
+    public void register(UserRegisterDTO userRegisterDTO) throws UserExistingWithName, UserExistingWithMail {
+        userRepository.findUserByLogin(userRegisterDTO.getLogin()).ifPresent(value->{
+            throw new UserExistingWithName("Użytkownik o nazwie juz istnieje");
+        });
+        userRepository.findUserByEmail(userRegisterDTO.getEmail()).ifPresent(value->{
+            throw new UserExistingWithMail("Użytkownik o mailu juz istnieje");
+        });
+
         User user = new User();
         user.setLogin(userRegisterDTO.getLogin());
         user.setEmail(userRegisterDTO.getEmail());
         user.setPassword(userRegisterDTO.getPassword());
-        if (userRegisterDTO.getRole() != null){
-            user.setRole(userRegisterDTO.getRole());
-        }else {
-            user.setRole(Role.USER);
-        }
+        user.setRole(Role.USER);
+
         saveUser(user);
     }
 
@@ -86,7 +96,7 @@ public class UserService {
             Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
             if (authenticate.isAuthenticated()) {
                 Cookie refresh = cookiService.generateCookie("refresh", generateToken(authRequest.getUsername(),refreshExp), refreshExp);
-                Cookie cookie = cookiService.generateCookie("token", generateToken(authRequest.getUsername(),exp), exp);
+                Cookie cookie = cookiService.generateCookie("Authorization", generateToken(authRequest.getUsername(),exp), exp);
                 response.addCookie(cookie);
                 response.addCookie(refresh);
                 return ResponseEntity.ok(
@@ -102,5 +112,13 @@ public class UserService {
         }
         return ResponseEntity.ok(new AuthResponse(Code.A2));
     }
+
+    public void setAsAdmin(UserRegisterDTO user) {
+        userRepository.findUserByLogin(user.getLogin()).ifPresent(value->{
+            value.setRole(Role.ADMIN);
+            userRepository.save(value);
+        });
+    }
+
 
 }

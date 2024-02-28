@@ -45,4 +45,18 @@ public class JwtService {
                 .setExpiration(new Date(System.currentTimeMillis() + exp))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
     }
+
+    private String getSubject(final String token){
+        return Jwts
+                .parser()
+                .setSigningKey(SECRET)
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
+
+    public String refreshToken(final String token, int exp){
+        String username = getSubject(token);
+        return generateToken(username, exp);
+    }
 }

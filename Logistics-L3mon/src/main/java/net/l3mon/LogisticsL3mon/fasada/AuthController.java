@@ -1,5 +1,7 @@
 package net.l3mon.LogisticsL3mon.fasada;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,18 +36,23 @@ public class AuthController {
     @RequestMapping(path = "/register", method = RequestMethod.POST)
     public ResponseEntity<AuthResponse> addNewUser(@RequestBody UserRegisterDTO user){
         try{
-            log.info("--START REGISTER USER");
             userService.register(user);
-            log.info("--STOP REGISTER USER");
             return ResponseEntity.ok(new AuthResponse(Code.SUCCESS));
         }catch (UserExistingWithName e){
-            log.info("User don't exist in database");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse(Code.A4));
         }catch (UserExistingWithMail existing){
-            log.info("User don't exist in database with this mail");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse(Code.A5));
         }
+    }
 
+    @RequestMapping(path = "/validate", method = RequestMethod.GET)
+    public ResponseEntity<AuthResponse> validateToken(HttpServletRequest request, HttpServletResponse response){
+        try{
+            userService.validateToken(request, response);
+            return ResponseEntity.ok(new AuthResponse(Code.PERMIT));
+        } catch (IllegalArgumentException | ExpiredJwtException e){
+            return ResponseEntity.status(401).body(new AuthResponse(Code.A3));
+        }
     }
 
 }

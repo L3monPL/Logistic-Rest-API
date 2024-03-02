@@ -17,6 +17,7 @@ public class CustomUserDetails implements UserDetails {
     public CustomUserDetails(User user){
         this.username = user.getUsername();
         this.password = user.getPassword();
+        this.role = user.getRole();
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -1,4 +1,4 @@
-package net.l3mon.LogisticsL3mon.exceptions;
+package net.l3mon.LogisticsL3mon.UserAuth.exceptions;
 
 public class UserExistingWithName extends RuntimeException{
     public UserExistingWithName(String message) {

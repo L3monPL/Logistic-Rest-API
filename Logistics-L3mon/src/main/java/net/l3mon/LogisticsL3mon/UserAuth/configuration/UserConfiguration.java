@@ -1,7 +1,7 @@
-package net.l3mon.LogisticsL3mon.configuration;
+package net.l3mon.LogisticsL3mon.UserAuth.configuration;
 
 import lombok.RequiredArgsConstructor;
-import net.l3mon.LogisticsL3mon.repository.UserRepository;
+import net.l3mon.LogisticsL3mon.UserAuth.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

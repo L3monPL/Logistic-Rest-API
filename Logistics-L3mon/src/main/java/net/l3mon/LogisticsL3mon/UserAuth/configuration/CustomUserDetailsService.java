@@ -1,8 +1,8 @@
-package net.l3mon.LogisticsL3mon.configuration;
+package net.l3mon.LogisticsL3mon.UserAuth.configuration;
 
 import lombok.RequiredArgsConstructor;
-import net.l3mon.LogisticsL3mon.entity.User;
-import net.l3mon.LogisticsL3mon.repository.UserRepository;
+import net.l3mon.LogisticsL3mon.UserAuth.entity.User;
+import net.l3mon.LogisticsL3mon.UserAuth.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

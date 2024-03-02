@@ -1,23 +1,22 @@
-package net.l3mon.LogisticsL3mon.service;
+package net.l3mon.LogisticsL3mon.UserAuth.service;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import net.l3mon.LogisticsL3mon.dto.UserRegisterDTO;
-import net.l3mon.LogisticsL3mon.entity.AuthResponse;
-import net.l3mon.LogisticsL3mon.entity.Code;
-import net.l3mon.LogisticsL3mon.entity.Role;
-import net.l3mon.LogisticsL3mon.entity.User;
-import net.l3mon.LogisticsL3mon.exceptions.UserExistingWithMail;
-import net.l3mon.LogisticsL3mon.exceptions.UserExistingWithName;
-import net.l3mon.LogisticsL3mon.repository.UserRepository;
+import net.l3mon.LogisticsL3mon.UserAuth.dto.UserRegisterDTO;
+import net.l3mon.LogisticsL3mon.UserAuth.entity.AuthResponse;
+import net.l3mon.LogisticsL3mon.UserAuth.entity.Code;
+import net.l3mon.LogisticsL3mon.UserAuth.entity.Role;
+import net.l3mon.LogisticsL3mon.UserAuth.entity.User;
+import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserExistingWithMail;
+import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserExistingWithName;
+import net.l3mon.LogisticsL3mon.UserAuth.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -47,6 +46,18 @@ public class UserService {
 
     private String generateToken(String username,int exp) {
         return jwtService.generateToken(username, exp);
+    }
+
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response){
+        Cookie cookie = cookiService.removeCookie(request.getCookies(),"Authorization");
+        if (cookie != null){
+            response.addCookie(cookie);
+        }
+        cookie = cookiService.removeCookie(request.getCookies(),"refresh");
+        if (cookie != null){
+            response.addCookie(cookie);
+        }
+        return  ResponseEntity.ok(new AuthResponse(Code.SUCCESS));
     }
 
 

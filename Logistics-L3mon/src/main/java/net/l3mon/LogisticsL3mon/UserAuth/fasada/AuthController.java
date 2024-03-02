@@ -1,4 +1,4 @@
-package net.l3mon.LogisticsL3mon.fasada;
+package net.l3mon.LogisticsL3mon.UserAuth.fasada;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -6,14 +6,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.l3mon.LogisticsL3mon.dto.UserRegisterDTO;
-import net.l3mon.LogisticsL3mon.entity.AuthResponse;
-import net.l3mon.LogisticsL3mon.entity.Code;
-import net.l3mon.LogisticsL3mon.entity.User;
-import net.l3mon.LogisticsL3mon.entity.ValidationMessage;
-import net.l3mon.LogisticsL3mon.exceptions.UserExistingWithMail;
-import net.l3mon.LogisticsL3mon.exceptions.UserExistingWithName;
-import net.l3mon.LogisticsL3mon.service.UserService;
+import net.l3mon.LogisticsL3mon.UserAuth.dto.UserRegisterDTO;
+import net.l3mon.LogisticsL3mon.UserAuth.entity.AuthResponse;
+import net.l3mon.LogisticsL3mon.UserAuth.entity.Code;
+import net.l3mon.LogisticsL3mon.UserAuth.entity.ValidationMessage;
+import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserExistingWithMail;
+import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserExistingWithName;
+import net.l3mon.LogisticsL3mon.UserAuth.entity.User;
+import net.l3mon.LogisticsL3mon.UserAuth.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -53,6 +53,13 @@ public class AuthController {
             return ResponseEntity.status(401).body(new AuthResponse(Code.A3));
         }
     }
+
+    @RequestMapping(path = "/logout",method = RequestMethod.GET)
+    public ResponseEntity<?> logout( HttpServletResponse response,HttpServletRequest request){
+        log.info("--TRY LOGOUT USER");
+        return userService.logout(request, response);
+    }
+
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)

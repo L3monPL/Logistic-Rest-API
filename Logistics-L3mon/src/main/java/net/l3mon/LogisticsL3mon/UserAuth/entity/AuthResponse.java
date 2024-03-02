@@ -1,7 +1,5 @@
-package net.l3mon.LogisticsL3mon.entity;
+package net.l3mon.LogisticsL3mon.UserAuth.entity;
 
-import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 
 import java.sql.Timestamp;

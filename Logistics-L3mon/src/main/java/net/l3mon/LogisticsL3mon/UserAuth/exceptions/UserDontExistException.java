@@ -1,4 +1,4 @@
-package net.l3mon.LogisticsL3mon.exceptions;
+package net.l3mon.LogisticsL3mon.UserAuth.exceptions;
 
 public class UserDontExistException extends RuntimeException{
     public UserDontExistException(String message) {

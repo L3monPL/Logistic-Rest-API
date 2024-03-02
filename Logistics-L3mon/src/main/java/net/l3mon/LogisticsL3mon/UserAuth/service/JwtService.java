@@ -1,4 +1,4 @@
-package net.l3mon.LogisticsL3mon.service;
+package net.l3mon.LogisticsL3mon.UserAuth.service;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtParserBuilder;

@@ -1,4 +1,4 @@
-package net.l3mon.LogisticsL3mon.entity;
+package net.l3mon.LogisticsL3mon.UserAuth.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

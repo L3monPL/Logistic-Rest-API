@@ -1,7 +1,7 @@
-package net.l3mon.LogisticsL3mon.configuration;
+package net.l3mon.LogisticsL3mon.UserAuth.configuration;
 
-import net.l3mon.LogisticsL3mon.entity.Role;
-import net.l3mon.LogisticsL3mon.entity.User;
+import net.l3mon.LogisticsL3mon.UserAuth.entity.Role;
+import net.l3mon.LogisticsL3mon.UserAuth.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

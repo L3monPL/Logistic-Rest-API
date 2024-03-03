@@ -40,6 +40,9 @@ public class User implements UserDetails {
     @Column(name = "role", nullable = false)
     private Role role;
 
+    @Column(name = "companyid", nullable = false)
+    private Integer companyId;
+
     @Column(name = "islock")
     private boolean isLock;
 

@@ -12,6 +12,7 @@ import net.l3mon.LogisticsL3mon.UserAuth.entity.Role;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.User;
 import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserExistingWithMail;
 import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserExistingWithName;
+import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserNullConpanyIdException;
 import net.l3mon.LogisticsL3mon.UserAuth.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -84,7 +85,7 @@ public class UserService {
     }
 
 
-    public void register(UserRegisterDTO userRegisterDTO) throws UserExistingWithName, UserExistingWithMail {
+    public void register(UserRegisterDTO userRegisterDTO) throws UserExistingWithName, UserExistingWithMail, UserNullConpanyIdException {
         userRepository.findUserByLogin(userRegisterDTO.getLogin()).ifPresent(value->{
             throw new UserExistingWithName("Użytkownik o nazwie juz istnieje");
         });
@@ -92,10 +93,15 @@ public class UserService {
             throw new UserExistingWithMail("Użytkownik o mailu juz istnieje");
         });
 
+        if (userRegisterDTO.getCompanyId() == null || userRegisterDTO.getCompanyId() < 0){
+            throw new UserNullConpanyIdException("Nie przypisano użytkownika do firmy");
+        }
+
         User user = new User();
         user.setLogin(userRegisterDTO.getLogin());
         user.setEmail(userRegisterDTO.getEmail());
         user.setPassword(userRegisterDTO.getPassword());
+        user.setCompanyId(userRegisterDTO.getCompanyId());
         user.setRole(Role.USER);
 
         saveUser(user);

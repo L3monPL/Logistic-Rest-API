@@ -1,4 +1,4 @@
-package net.l3mon.LogisticsL3mon.UserAuth.fasada;
+package net.l3mon.LogisticsL3mon.UserAuth.controller;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,6 +13,7 @@ import net.l3mon.LogisticsL3mon.UserAuth.entity.ValidationMessage;
 import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserExistingWithMail;
 import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserExistingWithName;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.User;
+import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserNullConpanyIdException;
 import net.l3mon.LogisticsL3mon.UserAuth.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +42,8 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse(Code.A4));
         }catch (UserExistingWithMail existing){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse(Code.A5));
+        }catch (UserNullConpanyIdException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse(Code.A7));
         }
     }
 

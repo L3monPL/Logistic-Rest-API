@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.l3mon.LogisticsL3mon.company.entity.Company;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,8 +41,10 @@ public class User implements UserDetails {
     @Column(name = "role", nullable = false)
     private Role role;
 
-    @Column(name = "companyid", nullable = false)
-    private Integer companyId;
+//    @Column(name = "companyid", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "companyid", nullable = false)
+    private Company company;
 
     @Column(name = "islock")
     private boolean isLock;
@@ -94,4 +97,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return isEnabled;
     }
+
 }

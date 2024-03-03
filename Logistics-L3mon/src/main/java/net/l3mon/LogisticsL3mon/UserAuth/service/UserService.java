@@ -1,6 +1,7 @@
 package net.l3mon.LogisticsL3mon.UserAuth.service;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,6 +15,8 @@ import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserExistingWithMail;
 import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserExistingWithName;
 import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserNullConpanyIdException;
 import net.l3mon.LogisticsL3mon.UserAuth.repository.UserRepository;
+import net.l3mon.LogisticsL3mon.company.entity.Company;
+import net.l3mon.LogisticsL3mon.company.repository.CompanyRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,6 +33,7 @@ import java.util.Arrays;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final CompanyRepository companyRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -96,12 +100,15 @@ public class UserService {
         if (userRegisterDTO.getCompanyId() == null || userRegisterDTO.getCompanyId() < 0){
             throw new UserNullConpanyIdException("Nie przypisano użytkownika do firmy");
         }
+        // Pobieranie obiektu Company na podstawie przekazanego companyId
+        Company company = companyRepository.findById(Long.valueOf(userRegisterDTO.getCompanyId()))
+                .orElseThrow(() -> new EntityNotFoundException("Company with id " + userRegisterDTO.getCompanyId() + " not found"));
 
         User user = new User();
         user.setLogin(userRegisterDTO.getLogin());
         user.setEmail(userRegisterDTO.getEmail());
         user.setPassword(userRegisterDTO.getPassword());
-        user.setCompanyId(userRegisterDTO.getCompanyId());
+        user.setCompany(company);
         user.setRole(Role.USER);
 
         saveUser(user);
@@ -116,12 +123,17 @@ public class UserService {
                 Cookie cookie = cookiService.generateCookie("Authorization", generateToken(authRequest.getUsername(),exp), exp);
                 response.addCookie(cookie);
                 response.addCookie(refresh);
+
+//                Company company = companyRepository.findById(user.getCompany().getId())
+//                        .orElseThrow(() -> new EntityNotFoundException("Company with this id not found"));
+
                 return ResponseEntity.ok(
                         UserRegisterDTO
                                 .builder()
                                 .login(user.getUsername())
                                 .email(user.getEmail())
                                 .role(user.getRole())
+                                .companyId(Math.toIntExact(user.getCompany().getId()))
                                 .build());
             } else {
                 return ResponseEntity.ok(new AuthResponse(Code.A1));

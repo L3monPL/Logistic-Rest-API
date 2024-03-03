@@ -19,7 +19,7 @@ public class CustomUserDetails implements UserDetails {
         this.username = user.getUsername();
         this.password = user.getPassword();
         this.role = user.getRole();
-        this.companyId = user.getCompanyId();
+        this.companyId = Math.toIntExact(user.getCompany().getId());
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

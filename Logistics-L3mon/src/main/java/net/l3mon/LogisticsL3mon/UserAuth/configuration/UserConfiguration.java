@@ -20,9 +20,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class UserConfiguration {
 
     private UserRepository userRepository;
+    private final HeaderAuthenticationJwtFilter headerAuthenticationJwtFilter;
 
     @Bean
     public UserDetailsService userDetailsService(){
@@ -44,7 +46,8 @@ public class UserConfiguration {
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
-                .addFilterBefore(new HeaderAuthenticationJwtFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(headerAuthenticationJwtFilter, UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(new HeaderAuthenticationJwtFilter(), UsernamePasswordAuthenticationFilter.class)
 //                .exceptionHandling(exceptionHandling ->
 //                        exceptionHandling.authenticationEntryPoint(new CustomAccessDeniedHandler())
 //                )

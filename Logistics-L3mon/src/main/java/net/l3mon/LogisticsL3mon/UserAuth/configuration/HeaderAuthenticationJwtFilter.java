@@ -15,11 +15,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 @Component
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class HeaderAuthenticationJwtFilter extends OncePerRequestFilter {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
     public final String SECRET = "AD01FDF92498FF62C1B9E7E9193CCCCE8EAB8E50CEE980BC7BD72FB9A49B5262";
     public static final String USER = "USER";
     public static final String USER_AUTH_EXCEPTIONS = "USER_AUTH_EXCEPTIONS";

@@ -37,7 +37,7 @@ public class UserConfiguration {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/*", "/api/v1/company/*", "ws/**").permitAll()
-                        .requestMatchers("/chat/**").hasRole("USER")
+                        .requestMatchers("/chat/**").permitAll()
                         .requestMatchers("/chat**").permitAll()
                         .anyRequest().authenticated()
                 )

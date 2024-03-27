@@ -6,6 +6,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.l3mon.LogisticsL3mon.UserAuth.dto.UserRegisterDTO;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.AuthResponse;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.Code;
@@ -30,6 +31,7 @@ import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;

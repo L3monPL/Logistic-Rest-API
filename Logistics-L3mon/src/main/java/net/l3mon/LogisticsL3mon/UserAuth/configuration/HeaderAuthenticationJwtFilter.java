@@ -11,9 +11,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.User;
 import net.l3mon.LogisticsL3mon.UserAuth.repository.UserRepository;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
+import java.util.Collections;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -55,8 +60,23 @@ public class HeaderAuthenticationJwtFilter extends OncePerRequestFilter {
 
             User user = userRepository.findUserByLogin(userLogin).orElse(null);
 
-            log.info(String.valueOf(user));
+            assert user != null;
+            log.info(String.valueOf(user.getRole()));
 
+            org.springframework.security.core.userdetails.User authUser = new org.springframework.security.core.userdetails.User(
+                    user.getLogin(),
+                    user.getPassword(),
+                    Collections.singletonList(new SimpleGrantedAuthority("USER"))
+            );
+
+//            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+//                    authUser,
+//                    null,
+//                    authUser.getAuthorities()
+//            );
+
+//            SecurityContextHolder.getContext().setAuthentication(authentication);
+            request.setAttribute(USER, user);
             filterChain.doFilter(request, response);
 
         }catch (Exception e){

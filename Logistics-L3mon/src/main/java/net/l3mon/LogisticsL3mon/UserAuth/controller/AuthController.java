@@ -30,6 +30,7 @@ public class AuthController {
 
     @RequestMapping(path = "/login",method = RequestMethod.POST)
     public ResponseEntity<?> login(@RequestBody User user, HttpServletResponse response){
+        log.info("--TRY LOGIN USER");
         return userService.login(response,user);
     }
 

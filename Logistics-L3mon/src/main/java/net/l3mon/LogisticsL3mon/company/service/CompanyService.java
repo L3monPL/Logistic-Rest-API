@@ -13,6 +13,9 @@ import net.l3mon.LogisticsL3mon.company.entity.Company;
 import net.l3mon.LogisticsL3mon.company.repository.CompanyRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class CompanyService {
@@ -45,5 +48,9 @@ public class CompanyService {
         company.setCreatedAt("created time");
 
         saveCompany(company);
+    }
+
+    public List<Company> getAllCompanies(){
+        return companyRepository.findAll();
     }
 }

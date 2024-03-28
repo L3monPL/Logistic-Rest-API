@@ -10,6 +10,7 @@ import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserExistingWithMail;
 import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserExistingWithName;
 import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserNullConpanyIdException;
 import net.l3mon.LogisticsL3mon.company.dto.CompanyDTO;
+import net.l3mon.LogisticsL3mon.company.entity.Company;
 import net.l3mon.LogisticsL3mon.company.service.CompanyService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/company")
@@ -32,5 +35,15 @@ public class CompanyController {
             companyService.create(company);
             return ResponseEntity.ok("success");
 //        }
+    }
+
+    @RequestMapping(path = "/companies", method = RequestMethod.GET)
+    public ResponseEntity<List<Company>> getAllCompanies() {
+        List<Company> companies = companyService.getAllCompanies();
+        if (companies.isEmpty()) {
+            return ResponseEntity.noContent().build(); // Brak firm do wyświetlenia
+        } else {
+            return ResponseEntity.ok(companies); // Zwróć listę firm
+        }
     }
 }

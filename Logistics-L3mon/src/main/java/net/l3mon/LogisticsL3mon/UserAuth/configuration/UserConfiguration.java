@@ -25,8 +25,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Slf4j
 public class UserConfiguration {
 
-    private UserRepository userRepository;
-//    private final HeaderAuthenticationJwtFilter headerAuthenticationJwtFilter;
+    private final UserRepository userRepository;
+    private final HeaderAuthenticationJwtFilter headerAuthenticationJwtFilter;
 
     @Bean
     public UserDetailsService userDetailsService(){
@@ -38,9 +38,11 @@ public class UserConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/*", "/api/v1/company/*", "ws/**").permitAll()
+                        .requestMatchers("/api/v1/auth/*", "ws/**").permitAll()
                         .requestMatchers("/chat/**").permitAll()
                         .requestMatchers("/chat**").permitAll()
+//                        .requestMatchers("/api/v1/company/*").permitAll()
+                        .requestMatchers("/api/v1/company/companies").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->
@@ -48,10 +50,10 @@ public class UserConfiguration {
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
-//                .addFilterBefore(headerAuthenticationJwtFilter, UsernamePasswordAuthenticationFilter.class)
-//                .exceptionHandling(exceptionHandling ->
-//                                exceptionHandling.authenticationEntryPoint(new CustomAccessDeniedHandler())
-//                )
+                .addFilterBefore(headerAuthenticationJwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exceptionHandling ->
+                                exceptionHandling.authenticationEntryPoint(new CustomAccessDeniedHandler())
+                )
                 .build();
     }
 

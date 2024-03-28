@@ -15,9 +15,12 @@ import net.l3mon.LogisticsL3mon.room.entity.Room;
 import net.l3mon.LogisticsL3mon.room.repository.RoomRepository;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -62,6 +65,19 @@ public class CompanyService {
     }
 
     public List<Company> getAllCompanies(){
+        System.out.println(generateUniqueCode());
         return companyRepository.findAll();
+    }
+
+    private String generateUniqueCode() {
+        StringBuilder codeBuilder = new StringBuilder();
+        Random random = new SecureRandom();
+        for (int i = 0; i < 24; i++) {
+            if (i > 0 && i % 6 == 0) {
+                codeBuilder.append("-");
+            }
+            codeBuilder.append((char)('a' + random.nextInt(26)));
+        }
+        return codeBuilder.toString();
     }
 }

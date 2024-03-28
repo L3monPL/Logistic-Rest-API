@@ -32,7 +32,6 @@ public class CompanyController {
 
     @RequestMapping(path = "/create", method = RequestMethod.POST)
     public ResponseEntity<?>  addNewCompany(@RequestBody CompanyDTO company){
-//        return companyService.create(company);
         try {
             return ResponseEntity.ok(companyService.create(company));
         } catch (Exception ex) {

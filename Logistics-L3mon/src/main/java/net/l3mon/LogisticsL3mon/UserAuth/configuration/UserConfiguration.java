@@ -1,6 +1,7 @@
 package net.l3mon.LogisticsL3mon.UserAuth.configuration;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.l3mon.LogisticsL3mon.UserAuth.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,10 +22,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@Slf4j
 public class UserConfiguration {
 
     private UserRepository userRepository;
-    private final HeaderAuthenticationJwtFilter headerAuthenticationJwtFilter;
+//    private final HeaderAuthenticationJwtFilter headerAuthenticationJwtFilter;
 
     @Bean
     public UserDetailsService userDetailsService(){
@@ -46,10 +48,9 @@ public class UserConfiguration {
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
-                .addFilterBefore(headerAuthenticationJwtFilter, UsernamePasswordAuthenticationFilter.class)
-//                .addFilterBefore(new HeaderAuthenticationJwtFilter(), UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(headerAuthenticationJwtFilter, UsernamePasswordAuthenticationFilter.class)
 //                .exceptionHandling(exceptionHandling ->
-//                        exceptionHandling.authenticationEntryPoint(new CustomAccessDeniedHandler())
+//                                exceptionHandling.authenticationEntryPoint(new CustomAccessDeniedHandler())
 //                )
                 .build();
     }

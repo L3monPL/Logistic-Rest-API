@@ -3,6 +3,7 @@ package net.l3mon.LogisticsL3mon.company.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.l3mon.LogisticsL3mon.Server.ErrorResponse;
 import net.l3mon.LogisticsL3mon.UserAuth.dto.UserRegisterDTO;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.AuthResponse;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.Code;
@@ -30,11 +31,14 @@ public class CompanyController {
     private final CompanyService companyService;
 
     @RequestMapping(path = "/create", method = RequestMethod.POST)
-    public ResponseEntity<?> addNewCompany(@RequestBody CompanyDTO company){
-//        try{
-            companyService.create(company);
-            return ResponseEntity.ok("success");
-//        }
+    public ResponseEntity<?>  addNewCompany(@RequestBody CompanyDTO company){
+//        return companyService.create(company);
+        try {
+            return ResponseEntity.ok(companyService.create(company));
+        } catch (Exception ex) {
+            ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
     }
 
     @RequestMapping(path = "/companies", method = RequestMethod.GET)

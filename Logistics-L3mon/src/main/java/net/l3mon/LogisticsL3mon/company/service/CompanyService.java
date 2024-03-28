@@ -11,8 +11,11 @@ import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserNullConpanyIdException;
 import net.l3mon.LogisticsL3mon.company.dto.CompanyDTO;
 import net.l3mon.LogisticsL3mon.company.entity.Company;
 import net.l3mon.LogisticsL3mon.company.repository.CompanyRepository;
+import net.l3mon.LogisticsL3mon.room.entity.Room;
+import net.l3mon.LogisticsL3mon.room.repository.RoomRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,32 +25,40 @@ public class CompanyService {
 
     private final CompanyRepository companyRepository;
 
+    private final RoomRepository roomRepository;
+
     private Company saveCompany(Company company){
         return companyRepository.saveAndFlush(company);
     }
 
-    public void create(CompanyDTO companyDTO) {
-//        userRepository.findUserByLogin(userRegisterDTO.getLogin()).ifPresent(value->{
-//            throw new UserExistingWithName("Użytkownik o nazwie juz istnieje");
-//        });
-//        userRepository.findUserByEmail(userRegisterDTO.getEmail()).ifPresent(value->{
-//            throw new UserExistingWithMail("Użytkownik o mailu juz istnieje");
-//        });
-//
-//        if (userRegisterDTO.getCompanyId() == null || userRegisterDTO.getCompanyId() < 0){
-//            throw new UserNullConpanyIdException("Nie przypisano użytkownika do firmy");
-//        }
-        // Pobieranie obiektu Company na podstawie przekazanego companyId
-//        Company company = companyRepository.findById(Long.valueOf(userRegisterDTO.getCompanyId()))
-//                .orElseThrow(() -> new EntityNotFoundException("Company with id " + userRegisterDTO.getCompanyId() + " not found"));
+    public Company create(CompanyDTO companyDTO) throws Exception {
 
-        Company company = new Company();
-        company.setName(companyDTO.getName());
-        company.setShortName(companyDTO.getShortName());
-        company.setEnable(true);
-        company.setCreatedAt("created time");
+        Company savedCompany;
+        try {
+            Company company = new Company();
+            company.setName(companyDTO.getName());
+            company.setShortName(companyDTO.getShortName());
+            company.setEnable(true);
+            company.setCreatedAt(String.valueOf(LocalDateTime.now()));
 
-        saveCompany(company);
+            savedCompany = companyRepository.save(company);
+        } catch (Exception ex) {
+            throw new Exception("Nie udało się utworzyć firmy: " + ex.getMessage());
+        }
+        try {
+            Room room = new Room();
+            room.setCompanyId(savedCompany.getId());
+            room.setName("Town Square");
+            room.setPermissionForAll(true);
+            room.setCreatedAt(String.valueOf(LocalDateTime.now()));
+
+            roomRepository.save(room);
+        } catch (Exception ex) {
+            companyRepository.delete(savedCompany);
+            throw new Exception("Nie udało się utworzyć firmy: " + ex.getMessage());
+        }
+
+        return savedCompany;
     }
 
     public List<Company> getAllCompanies(){

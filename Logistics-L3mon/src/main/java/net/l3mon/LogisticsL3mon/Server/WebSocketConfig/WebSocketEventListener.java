@@ -1,4 +1,4 @@
-package net.l3mon.LogisticsL3mon.WebSocketConfig;
+package net.l3mon.LogisticsL3mon.Server.WebSocketConfig;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package net.l3mon.LogisticsL3mon.WebSocketConfig;
+package net.l3mon.LogisticsL3mon.Server.WebSocketConfig;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

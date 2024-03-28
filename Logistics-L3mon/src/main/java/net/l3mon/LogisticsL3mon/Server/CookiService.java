@@ -1,4 +1,4 @@
-package net.l3mon.LogisticsL3mon.UserAuth.service;
+package net.l3mon.LogisticsL3mon.Server;
 
 import jakarta.servlet.http.Cookie;
 import org.springframework.beans.factory.annotation.Value;

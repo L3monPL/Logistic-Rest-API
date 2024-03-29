@@ -36,7 +36,7 @@ public class CompanyController {
             return ResponseEntity.ok(companyService.create(company));
         } catch (Exception ex) {
             ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }
 

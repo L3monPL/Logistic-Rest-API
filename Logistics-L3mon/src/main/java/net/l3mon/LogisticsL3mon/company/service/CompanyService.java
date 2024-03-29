@@ -10,6 +10,8 @@ import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserExistingWithName;
 import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserNullConpanyIdException;
 import net.l3mon.LogisticsL3mon.company.dto.CompanyDTO;
 import net.l3mon.LogisticsL3mon.company.entity.Company;
+import net.l3mon.LogisticsL3mon.company.entity.CompanyInviteLink;
+import net.l3mon.LogisticsL3mon.company.repository.CompanyInviteLinkRepository;
 import net.l3mon.LogisticsL3mon.company.repository.CompanyRepository;
 import net.l3mon.LogisticsL3mon.room.entity.Room;
 import net.l3mon.LogisticsL3mon.room.repository.RoomRepository;
@@ -27,14 +29,21 @@ import java.util.UUID;
 public class CompanyService {
 
     private final CompanyRepository companyRepository;
-
     private final RoomRepository roomRepository;
+    private final CompanyInviteLinkRepository companyInviteLinkRepository;
 
     private Company saveCompany(Company company){
         return companyRepository.saveAndFlush(company);
     }
 
     public Company create(CompanyDTO companyDTO) throws Exception {
+
+        if (isNullOrEmpty(companyDTO.getName())) {
+            throw new Exception("Nazwa firmy nie może być pusta");
+        }
+        if (isNullOrEmpty(companyDTO.getShortName())) {
+            throw new Exception("Skrócona nazwa firmy nie może być pusta");
+        }
 
         Company savedCompany;
         try {
@@ -48,8 +57,9 @@ public class CompanyService {
         } catch (Exception ex) {
             throw new Exception("Nie udało się utworzyć firmy: " + ex.getMessage());
         }
+        Room room;
         try {
-            Room room = new Room();
+            room = new Room();
             room.setCompanyId(savedCompany.getId());
             room.setName("Town Square");
             room.setPermissionForAll(true);
@@ -60,12 +70,23 @@ public class CompanyService {
             companyRepository.delete(savedCompany);
             throw new Exception("Nie udało się utworzyć firmy: " + ex.getMessage());
         }
+        try {
+            CompanyInviteLink companyInviteLink = new CompanyInviteLink();
+            companyInviteLink.setCompanyId(savedCompany.getId());
+            companyInviteLink.setCode(generateUniqueCode());
+            companyInviteLink.setCreatedAt(String.valueOf(LocalDateTime.now()));
+
+            companyInviteLinkRepository.save(companyInviteLink);
+        } catch (Exception ex) {
+            companyRepository.delete(savedCompany);
+            roomRepository.delete(room);
+            throw new Exception("Nie udało się utworzyć firmy: " + ex.getMessage());
+        }
 
         return savedCompany;
     }
 
     public List<Company> getAllCompanies(){
-        System.out.println(generateUniqueCode());
         return companyRepository.findAll();
     }
 
@@ -79,5 +100,9 @@ public class CompanyService {
             codeBuilder.append((char)('a' + random.nextInt(26)));
         }
         return codeBuilder.toString();
+    }
+
+    private boolean isNullOrEmpty(String str) {
+        return str == null || str.isEmpty();
     }
 }

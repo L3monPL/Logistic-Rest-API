@@ -15,7 +15,6 @@ public class UserLoginDTO {
     private String login;
     private String email;
     private String phone;
-    private Long companyId;
     private Role role;
     private boolean isLock;
     private boolean isEnabled;

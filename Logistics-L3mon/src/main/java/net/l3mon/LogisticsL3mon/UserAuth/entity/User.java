@@ -41,9 +41,6 @@ public class User implements UserDetails {
     @Column(name = "role", nullable = false)
     private Role role;
 
-    @Column(name = "company_id")
-    private Long companyId;
-
     @Column(name = "is_lock")
     private boolean isLock;
 

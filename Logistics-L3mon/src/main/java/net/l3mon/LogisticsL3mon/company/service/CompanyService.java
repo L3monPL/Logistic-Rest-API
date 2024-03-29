@@ -19,8 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -32,9 +31,22 @@ public class CompanyService {
     private final CompanyUserRepository companyUserRepository;
     private final UserRepository userRepository;
 
-//    private Company saveCompany(Company company){
-//        return companyRepository.saveAndFlush(company);
-//    }
+    //////////////////////////////////////////////////////////////////////////////////
+    private boolean isNullOrEmpty(String str) {
+    return str == null || str.isEmpty();
+}
+    private String generateUniqueCode() {
+        StringBuilder codeBuilder = new StringBuilder();
+        Random random = new SecureRandom();
+        for (int i = 0; i < 24; i++) {
+            if (i > 0 && i % 6 == 0) {
+                codeBuilder.append("-");
+            }
+            codeBuilder.append((char)('a' + random.nextInt(26)));
+        }
+        return codeBuilder.toString();
+    }
+    //////////////////////////////////////////////////////////////////////////////////
 
     public Company create(CompanyDTO companyDTO) throws GlobalExceptionMessage {
 
@@ -117,19 +129,31 @@ public class CompanyService {
         return companyRepository.findAll();
     }
 
-    private String generateUniqueCode() {
-        StringBuilder codeBuilder = new StringBuilder();
-        Random random = new SecureRandom();
-        for (int i = 0; i < 24; i++) {
-            if (i > 0 && i % 6 == 0) {
-                codeBuilder.append("-");
-            }
-            codeBuilder.append((char)('a' + random.nextInt(26)));
-        }
-        return codeBuilder.toString();
-    }
+    public List<?> getAllUserCompany() throws GlobalExceptionMessage {
 
-    private boolean isNullOrEmpty(String str) {
-        return str == null || str.isEmpty();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        User user = userRepository.findUserByLogin(username).orElse(null);
+        if (user == null) {
+            throw new GlobalExceptionMessage("User not found with username: " + username);
+        }
+
+        List<Optional<Company>> allUserCompany = new ArrayList<>();
+
+        List<CompanyUser> companyUsers = companyUserRepository.findByUserId(user.getId());
+        if (companyUsers == null) {
+            return allUserCompany;
+        }
+
+        for (CompanyUser companyUser : companyUsers) {
+            Long companyId = companyUser.getCompanyId();
+            Optional<Company> company = companyRepository.findById(companyId);
+            allUserCompany.add(company);
+        }
+
+        System.out.println(allUserCompany);
+
+        return allUserCompany;
     }
 }

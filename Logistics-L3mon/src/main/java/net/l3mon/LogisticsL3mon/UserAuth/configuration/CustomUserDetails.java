@@ -12,21 +12,12 @@ import java.util.List;
 public class CustomUserDetails implements UserDetails {
     private String username;
     private String password;
-    private Long companyId;
     private Role role;
 
     public CustomUserDetails(User user){
-        Long companyIdDetail;
-        if (user.getCompanyId() == null){
-            companyIdDetail = null;
-        }
-        else {
-            companyIdDetail = user.getCompanyId();
-        }
         this.username = user.getUsername();
         this.password = user.getPassword();
         this.role = user.getRole();
-        this.companyId = companyIdDetail;
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -103,19 +103,10 @@ public class UserService {
             throw new GlobalExceptionMessage("Użytkownik o mailu juz istnieje");
         });
 
-//        if (userRegisterDTO.getCompanyId() == null || userRegisterDTO.getCompanyId() < 0){
-//            throw new UserNullConpanyIdException("Nie przypisano użytkownika do firmy");
-//        }
-
-        // Pobieranie obiektu Company na podstawie przekazanego companyId
-//        Company company = companyRepository.findById(Long.valueOf(userRegisterDTO.getCompanyId()))
-//                .orElseThrow(() -> new EntityNotFoundException("Company with id " + userRegisterDTO.getCompanyId() + " not found"));
-
         User user = new User();
         user.setLogin(userRegisterDTO.getLogin());
         user.setEmail(userRegisterDTO.getEmail());
         user.setPassword(userRegisterDTO.getPassword());
-//        user.setCompany(company);
         user.setRole(Role.USER);
 
         saveUser(user);
@@ -133,18 +124,12 @@ public class UserService {
                 response.addCookie(cookie);
                 response.addCookie(refresh);
 
-//                Company company = companyRepository.findById(user.getCompany().getId())
-//                        .orElseThrow(() -> new EntityNotFoundException("Company with this id not found"));
-//                System.out.println(user.getCompany());
-
-
                 return ResponseEntity.ok(
                         UserLoginDTO
                                 .builder()
                                 .login(user.getUsername())
                                 .email(user.getEmail())
                                 .role(user.getRole())
-                                .companyId(user.getCompanyId())
                                 .phone(user.getPhone())
                                 .isLock(user.isLock())
                                 .isEnabled(user.isEnabled())

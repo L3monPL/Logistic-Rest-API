@@ -34,24 +34,29 @@ public class CompanyController {
         }
     }
 
+    //to change - przenieść na admina
     @RequestMapping(path = "/companies", method = RequestMethod.GET)
-    public ResponseEntity<List<Company>> getAllCompanies() {
-        List<Company> companies = companyService.getAllCompanies();
-        if (companies.isEmpty()) {
-            return ResponseEntity.noContent().build(); // Brak firm do wyświetlenia
-        } else {
-            return ResponseEntity.ok(companies); // Zwróć listę firm
+    public ResponseEntity<?> getAllCompanies() {
+        List<?> companies;
+        try {
+            companies = companyService.getAllCompanies();
+        } catch (GlobalExceptionMessage ex) {
+            ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
+        return ResponseEntity.ok(companies);
     }
 
-//    @RequestMapping(path = "/company/list", method = RequestMethod.GET)
-//    public ResponseEntity<List<Company>> getAllUserCompany() {
-//        List<Company> companies = companyService.getAllCompanies();
-//        if (companies.isEmpty()) {
-//            return ResponseEntity.noContent().build(); // Brak firm do wyświetlenia
-//        } else {
-//            return ResponseEntity.ok(companies); // Zwróć listę firm
-//        }
-//    }
+    @RequestMapping(path = "/company/list", method = RequestMethod.GET)
+    public ResponseEntity<?> getAllUserCompany() {
+        List<?> companies;
+        try {
+            companies = companyService.getAllUserCompany();
+        } catch (GlobalExceptionMessage ex) {
+            ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+        return ResponseEntity.ok(companies);
+    }
 
 }

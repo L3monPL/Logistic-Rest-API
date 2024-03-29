@@ -139,7 +139,7 @@ public class CompanyService {
             throw new GlobalExceptionMessage("User not found with username: " + username);
         }
 
-        List<Optional<Company>> allUserCompany = new ArrayList<>();
+        List<Company> allUserCompany = new ArrayList<>();
 
         List<CompanyUser> companyUsers = companyUserRepository.findByUserId(user.getId());
         if (companyUsers == null) {
@@ -148,12 +148,38 @@ public class CompanyService {
 
         for (CompanyUser companyUser : companyUsers) {
             Long companyId = companyUser.getCompanyId();
-            Optional<Company> company = companyRepository.findById(companyId);
+            Company company = companyRepository.findById(companyId).orElse(null);
+            if (company == null) {
+                throw new GlobalExceptionMessage("Błąd serwera");
+            }
             allUserCompany.add(company);
         }
 
         System.out.println(allUserCompany);
 
         return allUserCompany;
+    }
+
+    public CompanyInviteLink getCompanyInviteCode(Long companyId) throws GlobalExceptionMessage{
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        User user = userRepository.findUserByLogin(username).orElse(null);
+        if (user == null) {
+            throw new GlobalExceptionMessage("User not found with username: " + username);
+        }
+
+        CompanyUser companyUser = companyUserRepository.findByUserIdAndCompanyId(user.getId(), companyId).orElse(null);
+        if (companyUser == null) {
+            throw new GlobalExceptionMessage("Permission fail");
+        }
+
+        CompanyInviteLink companyInviteLink = companyInviteLinkRepository.findByCompanyId(companyId).orElse(null);
+        if (companyInviteLink == null) {
+            throw new GlobalExceptionMessage("Invite code doesn't exist");
+        }
+
+        return companyInviteLink;
     }
 }

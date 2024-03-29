@@ -26,4 +26,5 @@ public class CompanyUser {
 
     @Column(name = "created_at")
     private String createdAt;
+
 }

@@ -6,13 +6,12 @@ import net.l3mon.LogisticsL3mon.Server.ErrorResponse;
 import net.l3mon.LogisticsL3mon.Server.GlobalExceptionMessage;
 import net.l3mon.LogisticsL3mon.company.dto.CompanyDTO;
 import net.l3mon.LogisticsL3mon.company.entity.Company;
+import net.l3mon.LogisticsL3mon.company.entity.CompanyInviteLink;
+import net.l3mon.LogisticsL3mon.company.entity.CompanyUser;
 import net.l3mon.LogisticsL3mon.company.service.CompanyService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -47,7 +46,7 @@ public class CompanyController {
         return ResponseEntity.ok(companies);
     }
 
-    @RequestMapping(path = "/company/list", method = RequestMethod.GET)
+    @RequestMapping(path = "/list", method = RequestMethod.GET)
     public ResponseEntity<?> getAllUserCompany() {
         List<?> companies;
         try {
@@ -57,6 +56,18 @@ public class CompanyController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
         return ResponseEntity.ok(companies);
+    }
+
+    @RequestMapping(path = "/{companyId}/invite/code", method = RequestMethod.GET)
+    public ResponseEntity<?> getCompanyInviteCodeById(@PathVariable Long companyId) {
+        CompanyInviteLink companyInviteLink;
+        try {
+            companyInviteLink = companyService.getCompanyInviteCode(companyId);
+        } catch (GlobalExceptionMessage ex) {
+            ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+        return ResponseEntity.ok(companyInviteLink);
     }
 
 }

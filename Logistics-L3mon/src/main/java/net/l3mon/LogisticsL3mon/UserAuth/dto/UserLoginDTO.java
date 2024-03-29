@@ -1,6 +1,7 @@
 package net.l3mon.LogisticsL3mon.UserAuth.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.Column;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,13 +11,12 @@ import org.hibernate.validator.constraints.Length;
 @Getter
 @Setter
 @Builder
-public class UserRegisterDTO {
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @Length(min = 5,max = 50, message = "Login powinien mieć od 5 do 50 znaków")
+public class UserLoginDTO {
     private String login;
     private String email;
-    @Length(min = 5,max = 75, message = "Hasło powinno skałdać się od 5 do 75 znaków")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String password;
+    private String phone;
+    private Long companyId;
     private Role role;
+    private boolean isLock;
+    private boolean isEnabled;
 }

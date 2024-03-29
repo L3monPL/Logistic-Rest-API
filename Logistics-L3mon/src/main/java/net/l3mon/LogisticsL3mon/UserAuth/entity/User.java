@@ -25,7 +25,7 @@ public class User implements UserDetails {
     @SequenceGenerator(name = "users_id_seq", sequenceName = "users_id_seq", allocationSize = 1)
     private Long id;
 
-    @Column(name = "login")
+    @Column(name = "login", nullable = false, unique = true)
     private String login;
 
     @Column(name = "email", nullable = false, unique = true)
@@ -41,15 +41,13 @@ public class User implements UserDetails {
     @Column(name = "role", nullable = false)
     private Role role;
 
-//    @Column(name = "companyid", nullable = false)
-    @ManyToOne
-    @JoinColumn(name = "companyid", nullable = false)
-    private Company company;
+    @Column(name = "company_id")
+    private Long companyId;
 
-    @Column(name = "islock")
+    @Column(name = "is_lock")
     private boolean isLock;
 
-    @Column(name = "isenabled")
+    @Column(name = "is_enabled")
     private boolean isEnabled;
 
     @Override
@@ -61,7 +59,7 @@ public class User implements UserDetails {
         return this.role;
     }
 
-    private long getId(){
+    public Long getId(){
         return id;
     }
     public String getEmail() {
@@ -95,7 +93,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return isEnabled;
+        return !isEnabled;
     }
 
 }

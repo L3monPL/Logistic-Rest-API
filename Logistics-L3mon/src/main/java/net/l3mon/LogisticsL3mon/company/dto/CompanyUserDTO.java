@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class CompanyInviteLinkDTO {
+public class CompanyUserDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String code;
+    private Long userId;
 }

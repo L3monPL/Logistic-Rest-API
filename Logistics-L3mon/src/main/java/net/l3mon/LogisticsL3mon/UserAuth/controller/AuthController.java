@@ -6,14 +6,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.l3mon.LogisticsL3mon.Server.ErrorResponse;
+import net.l3mon.LogisticsL3mon.Server.GlobalExceptionMessage;
 import net.l3mon.LogisticsL3mon.UserAuth.dto.UserRegisterDTO;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.AuthResponse;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.Code;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.ValidationMessage;
-import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserExistingWithMail;
-import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserExistingWithName;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.User;
-import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserNullConpanyIdException;
 import net.l3mon.LogisticsL3mon.UserAuth.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,16 +34,13 @@ public class AuthController {
     }
 
     @RequestMapping(path = "/register", method = RequestMethod.POST)
-    public ResponseEntity<AuthResponse> addNewUser(@Valid @RequestBody UserRegisterDTO user){
+    public ResponseEntity<?> addNewUser(@Valid @RequestBody UserRegisterDTO user){
         try{
             userService.register(user);
             return ResponseEntity.ok(new AuthResponse(Code.SUCCESS));
-        }catch (UserExistingWithName e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse(Code.A4));
-        }catch (UserExistingWithMail existing){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse(Code.A5));
-        }catch (UserNullConpanyIdException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse(Code.A7));
+        }catch (GlobalExceptionMessage ex){
+            ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }
 

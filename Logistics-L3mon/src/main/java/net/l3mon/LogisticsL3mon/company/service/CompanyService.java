@@ -1,28 +1,26 @@
 package net.l3mon.LogisticsL3mon.company.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import net.l3mon.LogisticsL3mon.UserAuth.dto.UserRegisterDTO;
-import net.l3mon.LogisticsL3mon.UserAuth.entity.Role;
+import net.l3mon.LogisticsL3mon.Server.GlobalExceptionMessage;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.User;
-import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserExistingWithMail;
-import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserExistingWithName;
-import net.l3mon.LogisticsL3mon.UserAuth.exceptions.UserNullConpanyIdException;
+import net.l3mon.LogisticsL3mon.UserAuth.repository.UserRepository;
 import net.l3mon.LogisticsL3mon.company.dto.CompanyDTO;
 import net.l3mon.LogisticsL3mon.company.entity.Company;
 import net.l3mon.LogisticsL3mon.company.entity.CompanyInviteLink;
+import net.l3mon.LogisticsL3mon.company.entity.CompanyUser;
 import net.l3mon.LogisticsL3mon.company.repository.CompanyInviteLinkRepository;
 import net.l3mon.LogisticsL3mon.company.repository.CompanyRepository;
+import net.l3mon.LogisticsL3mon.company.repository.CompanyUserRepository;
 import net.l3mon.LogisticsL3mon.room.entity.Room;
 import net.l3mon.LogisticsL3mon.room.repository.RoomRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -31,18 +29,31 @@ public class CompanyService {
     private final CompanyRepository companyRepository;
     private final RoomRepository roomRepository;
     private final CompanyInviteLinkRepository companyInviteLinkRepository;
+    private final CompanyUserRepository companyUserRepository;
+    private final UserRepository userRepository;
 
-    private Company saveCompany(Company company){
-        return companyRepository.saveAndFlush(company);
-    }
+//    private Company saveCompany(Company company){
+//        return companyRepository.saveAndFlush(company);
+//    }
 
-    public Company create(CompanyDTO companyDTO) throws Exception {
+    public Company create(CompanyDTO companyDTO) throws GlobalExceptionMessage {
 
         if (isNullOrEmpty(companyDTO.getName())) {
-            throw new Exception("Nazwa firmy nie może być pusta");
+            throw new GlobalExceptionMessage("Nazwa firmy nie może być pusta");
         }
         if (isNullOrEmpty(companyDTO.getShortName())) {
-            throw new Exception("Skrócona nazwa firmy nie może być pusta");
+            throw new GlobalExceptionMessage("Skrócona nazwa firmy nie może być pusta");
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(authentication);
+//        String username = ((CustomUserDetails) authentication.getPrincipal()).getUsername();
+        String username = authentication.getName();
+        System.out.println(username);
+
+        User user = userRepository.findUserByLogin(username).orElse(null);
+        if (user == null) {
+            throw new GlobalExceptionMessage("User not found with username: " + username);
         }
 
         Company savedCompany;
@@ -54,8 +65,8 @@ public class CompanyService {
             company.setCreatedAt(String.valueOf(LocalDateTime.now()));
 
             savedCompany = companyRepository.save(company);
-        } catch (Exception ex) {
-            throw new Exception("Nie udało się utworzyć firmy: " + ex.getMessage());
+        } catch (GlobalExceptionMessage ex) {
+            throw new GlobalExceptionMessage("Nie udało się utworzyć firmy: " + ex.getMessage());
         }
         Room room;
         try {
@@ -66,21 +77,37 @@ public class CompanyService {
             room.setCreatedAt(String.valueOf(LocalDateTime.now()));
 
             roomRepository.save(room);
-        } catch (Exception ex) {
+        } catch (GlobalExceptionMessage ex) {
             companyRepository.delete(savedCompany);
-            throw new Exception("Nie udało się utworzyć firmy: " + ex.getMessage());
+            throw new GlobalExceptionMessage("Nie udało się utworzyć firmy: " + ex.getMessage());
         }
+        CompanyInviteLink companyInviteLink;
         try {
-            CompanyInviteLink companyInviteLink = new CompanyInviteLink();
+            companyInviteLink = new CompanyInviteLink();
             companyInviteLink.setCompanyId(savedCompany.getId());
             companyInviteLink.setCode(generateUniqueCode());
             companyInviteLink.setCreatedAt(String.valueOf(LocalDateTime.now()));
 
             companyInviteLinkRepository.save(companyInviteLink);
-        } catch (Exception ex) {
+        } catch (GlobalExceptionMessage ex) {
             companyRepository.delete(savedCompany);
             roomRepository.delete(room);
-            throw new Exception("Nie udało się utworzyć firmy: " + ex.getMessage());
+            throw new GlobalExceptionMessage("Nie udało się utworzyć firmy: " + ex.getMessage());
+        }
+        CompanyUser companyUser;
+        try {
+            companyUser = new CompanyUser();
+            companyUser.setCompanyId(savedCompany.getId());
+            companyUser.setUserId(user.getId());
+            companyUser.setCreatedAt(String.valueOf(LocalDateTime.now()));
+
+            companyUserRepository.save(companyUser);
+
+        } catch (GlobalExceptionMessage ex){
+            companyRepository.delete(savedCompany);
+            roomRepository.delete(room);
+            companyInviteLinkRepository.delete(companyInviteLink);
+            throw new GlobalExceptionMessage("Nie udało się utworzyć firmy: " + ex.getMessage());
         }
 
         return savedCompany;

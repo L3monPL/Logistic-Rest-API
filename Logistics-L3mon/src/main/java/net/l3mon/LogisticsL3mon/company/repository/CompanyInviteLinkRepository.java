@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface CompanyInviteLinkRepository extends JpaRepository<CompanyInviteLink, Long> {
     Optional<CompanyInviteLink> findByCompanyId(Long companyId);
+
+    Optional<CompanyInviteLink> findByCode(String code);
 }

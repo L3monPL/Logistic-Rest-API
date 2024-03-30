@@ -182,4 +182,29 @@ public class CompanyService {
 
         return companyInviteLink;
     }
+
+    public String joinCompanyByCode(String code) throws GlobalExceptionMessage{
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        User user = userRepository.findUserByLogin(username).orElse(null);
+        if (user == null) {
+            throw new GlobalExceptionMessage("User not found with username: " + username);
+        }
+
+        CompanyInviteLink companyInviteLink = companyInviteLinkRepository.findByCode(code).orElse(null);
+        if (companyInviteLink == null) {
+            throw new GlobalExceptionMessage("Code doesn't exist");
+        }
+
+        CompanyUser companyUser = companyUserRepository.findByUserIdAndCompanyId(user.getId(), companyInviteLink.getCompanyId()).orElse(null);
+        if (companyUser != null) {
+            throw new GlobalExceptionMessage("The user has already been added");
+        }
+
+        System.out.println(companyInviteLink.getCompanyId());
+
+
+        return "Udało się dołączyć";
+    }
 }

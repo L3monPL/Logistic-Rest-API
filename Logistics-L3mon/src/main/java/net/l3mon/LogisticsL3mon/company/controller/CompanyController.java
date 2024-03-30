@@ -70,4 +70,14 @@ public class CompanyController {
         return ResponseEntity.ok(companyInviteLink);
     }
 
+    @RequestMapping(path = "/join/{code}", method = RequestMethod.POST)
+    public ResponseEntity<?>  joinToCompany(@PathVariable String code){
+        try {
+            return ResponseEntity.ok(companyService.joinCompanyByCode(code));
+        } catch (GlobalExceptionMessage ex) {
+            ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
+
 }

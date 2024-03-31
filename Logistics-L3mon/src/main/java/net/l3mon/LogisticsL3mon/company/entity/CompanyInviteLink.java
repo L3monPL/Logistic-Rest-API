@@ -24,6 +24,9 @@ public class CompanyInviteLink {
     @Column(name = "code")
     private String code;
 
+    @Column(name = "requires_acceptance")
+    private boolean requiresAcceptance;
+
     @Column(name = "created_at")
     private String createdAt;
 }

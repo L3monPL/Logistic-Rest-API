@@ -8,9 +8,11 @@ import net.l3mon.LogisticsL3mon.company.dto.CompanyDTO;
 import net.l3mon.LogisticsL3mon.company.entity.Company;
 import net.l3mon.LogisticsL3mon.company.entity.CompanyInviteLink;
 import net.l3mon.LogisticsL3mon.company.entity.CompanyUser;
+import net.l3mon.LogisticsL3mon.company.entity.CompanyUserWaitingToJoin;
 import net.l3mon.LogisticsL3mon.company.repository.CompanyInviteLinkRepository;
 import net.l3mon.LogisticsL3mon.company.repository.CompanyRepository;
 import net.l3mon.LogisticsL3mon.company.repository.CompanyUserRepository;
+import net.l3mon.LogisticsL3mon.company.repository.CompanyUserWaitingToJoinRepository;
 import net.l3mon.LogisticsL3mon.room.entity.Room;
 import net.l3mon.LogisticsL3mon.room.repository.RoomRepository;
 import org.springframework.security.core.Authentication;
@@ -30,6 +32,7 @@ public class CompanyService {
     private final CompanyInviteLinkRepository companyInviteLinkRepository;
     private final CompanyUserRepository companyUserRepository;
     private final UserRepository userRepository;
+    private final CompanyUserWaitingToJoinRepository companyUserWaitingToJoinRepository;
 
     //////////////////////////////////////////////////////////////////////////////////
     private boolean isNullOrEmpty(String str) {
@@ -98,6 +101,7 @@ public class CompanyService {
             companyInviteLink = new CompanyInviteLink();
             companyInviteLink.setCompanyId(savedCompany.getId());
             companyInviteLink.setCode(generateUniqueCode());
+            companyInviteLink.setRequiresAcceptance(true);
             companyInviteLink.setCreatedAt(String.valueOf(LocalDateTime.now()));
 
             companyInviteLinkRepository.save(companyInviteLink);
@@ -202,9 +206,32 @@ public class CompanyService {
             throw new GlobalExceptionMessage("The user has already been added");
         }
 
-        System.out.println(companyInviteLink.getCompanyId());
+        CompanyUserWaitingToJoin companyUserWaitingToJoin = companyUserWaitingToJoinRepository.findByUserIdAndCompanyId(user.getId(), companyInviteLink.getCompanyId()).orElse(null);
 
+        if (companyInviteLink.isRequiresAcceptance()){
+            if (companyUserWaitingToJoin != null) {
+//                throw new GlobalExceptionMessage("The user waits for confirmation from the administrator");
+                return "The user waits for confirmation from the administrator";
+            }
+            if (companyUserWaitingToJoin == null){
+                CompanyUserWaitingToJoin companyUserWaitingToJoinCreate;
+                try{
+                    companyUserWaitingToJoinCreate = new CompanyUserWaitingToJoin();
+                    companyUserWaitingToJoinCreate.setCompanyId(companyInviteLink.getCompanyId());
+                    companyUserWaitingToJoinCreate.setUserId(user.getId());
+                    companyUserWaitingToJoinCreate.setCreatedAt(String.valueOf(LocalDateTime.now()));
+                } catch (GlobalExceptionMessage ex){
+                    throw new GlobalExceptionMessage("Server error: companyUserWaitingToJoinCreate");
+                }
+                companyUserWaitingToJoinRepository.save(companyUserWaitingToJoinCreate);
+                return "Waiting for confirmation from the administrator";
+            }
+        } else if (!companyInviteLink.isRequiresAcceptance()) {
+            if (companyUserWaitingToJoin != null) {
+                companyUserWaitingToJoinRepository.delete(companyUserWaitingToJoin);
+            }
+        }
 
-        return "Udało się dołączyć";
+        return null;
     }
 }

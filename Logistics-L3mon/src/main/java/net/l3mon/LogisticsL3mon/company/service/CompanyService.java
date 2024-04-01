@@ -234,4 +234,22 @@ public class CompanyService {
 
         return null;
     }
+
+    public List<?> getAllUsersCompanyById(Long companyId) throws GlobalExceptionMessage{
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        User user = userRepository.findUserByLogin(username).orElse(null);
+        if (user == null) {
+            throw new GlobalExceptionMessage("User not found with username: " + username);
+        }
+
+        CompanyUser companyUser = companyUserRepository.findByUserIdAndCompanyId(user.getId(), companyId).orElse(null);
+        if (companyUser == null) {
+            throw new GlobalExceptionMessage("Don't have permission");
+        }
+
+
+        return null;
+    }
 }

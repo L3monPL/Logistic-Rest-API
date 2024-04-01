@@ -80,4 +80,16 @@ public class CompanyController {
         }
     }
 
+    @RequestMapping(path = "/{companyId}/users", method = RequestMethod.GET)
+    public ResponseEntity<?> getAllUsersCompanyById(@PathVariable Long companyId) {
+        List<?> users;
+        try {
+            users = companyService.getAllUsersCompanyById(companyId);
+        } catch (GlobalExceptionMessage ex) {
+            ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+        return ResponseEntity.ok(users);
+    }
+
 }

@@ -245,7 +245,7 @@ public class CompanyService {
         try {
             user = userRepository.findUserByLogin(username).orElse(null);
         } catch (GlobalExceptionMessage ex) {
-            throw new GlobalExceptionMessage("Nie udało się utworzyć firmy: " + ex.getMessage());
+            throw new GlobalExceptionMessage("error: " + ex.getMessage());
         }
         if (user == null) {
             throw new GlobalExceptionMessage("User not found with username: " + username);
@@ -292,6 +292,65 @@ public class CompanyService {
 
             allUserCompany.add(userToListDTO);
         }
+
+        return allUserCompany;
+    }
+
+    public List<?> getAllUsersWaitingToJoinCompany(Long companyId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        User user;
+        try {
+            user = userRepository.findUserByLogin(username).orElse(null);
+        } catch (GlobalExceptionMessage ex) {
+            throw new GlobalExceptionMessage("error: " + ex.getMessage());
+        }
+        if (user == null) {
+            throw new GlobalExceptionMessage("User not found with username: " + username);
+        }
+
+        CompanyUser companyUser;
+        try {
+            companyUser = companyUserRepository.findByUserIdAndCompanyId(user.getId(), companyId).orElse(null);
+        } catch (GlobalExceptionMessage ex) {
+            throw new GlobalExceptionMessage("Error: " + ex.getMessage());
+        }
+        if (companyUser == null) {
+            throw new GlobalExceptionMessage("Don't have permission");
+        }
+
+        List<CompanyUserWaitingToJoin> companyUserWaitingToJoins;
+        try {
+            companyUserWaitingToJoins = companyUserWaitingToJoinRepository.findAllByCompanyId(companyId);
+        } catch (GlobalExceptionMessage ex) {
+            throw new GlobalExceptionMessage("Error: " + ex.getMessage());
+        }
+
+        List<UserToListDTO> allUserCompany = new ArrayList<>();
+
+        for (CompanyUserWaitingToJoin CompanyUserWaitingToJoinCurrent : companyUserWaitingToJoins) {
+            Long userId = CompanyUserWaitingToJoinCurrent.getUserId();
+
+            User userCurrent;
+            try {
+                userCurrent = userRepository.findById(userId).orElse(null);
+            } catch (GlobalExceptionMessage ex) {
+                throw new GlobalExceptionMessage("Error: " + ex.getMessage());
+            }
+            if (userCurrent == null) {
+                throw new GlobalExceptionMessage("Error");
+            }
+
+            UserToListDTO userToListDTO = new UserToListDTO();
+            userToListDTO.setUsername(userCurrent.getUsername());
+            userToListDTO.setEmail(userCurrent.getEmail());
+            userToListDTO.setCompany_role("WAITING");
+            userToListDTO.setPhone(userCurrent.getPhone());
+
+            allUserCompany.add(userToListDTO);
+        }
+
 
         return allUserCompany;
     }

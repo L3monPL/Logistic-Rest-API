@@ -2,6 +2,7 @@ package net.l3mon.LogisticsL3mon.company.service;
 
 import lombok.RequiredArgsConstructor;
 import net.l3mon.LogisticsL3mon.Server.GlobalExceptionMessage;
+import net.l3mon.LogisticsL3mon.Server.ResponseMessage;
 import net.l3mon.LogisticsL3mon.UserAuth.dto.UserToListDTO;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.User;
 import net.l3mon.LogisticsL3mon.UserAuth.repository.UserRepository;
@@ -189,7 +190,7 @@ public class CompanyService {
         return companyInviteLink;
     }
 
-    public String joinCompanyByCode(String code) throws GlobalExceptionMessage{
+    public ResponseMessage joinCompanyByCode(String code) throws GlobalExceptionMessage{
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
@@ -213,7 +214,7 @@ public class CompanyService {
         if (companyInviteLink.isRequiresAcceptance()){
             if (companyUserWaitingToJoin != null) {
 //                throw new GlobalExceptionMessage("The user waits for confirmation from the administrator");
-                return "The user waits for confirmation from the administrator";
+                return new ResponseMessage("The user waits for confirmation from the administrator");
             }
 //            if (companyUserWaitingToJoin == null){
                 CompanyUserWaitingToJoin companyUserWaitingToJoinCreate;
@@ -226,7 +227,7 @@ public class CompanyService {
                     throw new GlobalExceptionMessage("Server error: companyUserWaitingToJoinCreate");
                 }
                 companyUserWaitingToJoinRepository.save(companyUserWaitingToJoinCreate);
-                return "Waiting for confirmation from the administrator";
+                return new ResponseMessage("Waiting for confirmation from the administrator");
 //            }
         } else {
             if (companyUserWaitingToJoin != null) {
@@ -246,7 +247,7 @@ public class CompanyService {
             }
         }
 
-        return "User added successfully";
+        return new ResponseMessage("User added successfully");
     }
 
     public List<?> getAllUsersCompanyById(Long companyId) throws GlobalExceptionMessage{
@@ -369,7 +370,7 @@ public class CompanyService {
         return allUserCompany;
     }
 
-    public String acceptUserJoinToCompany(Long companyId, Long userId) {
+    public ResponseMessage acceptUserJoinToCompany(Long companyId, Long userId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
@@ -434,6 +435,6 @@ public class CompanyService {
             throw new GlobalExceptionMessage("Error: " + ex.getMessage());
         }
 
-        return "User added successfully";
+        return new ResponseMessage("User added successfully");
     }
 }

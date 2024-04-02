@@ -1,14 +1,13 @@
 package net.l3mon.LogisticsL3mon.room.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class RoomDTO {
-    private Long id;
     private Long companyId;
     private String name;
     private boolean permissionForAll;

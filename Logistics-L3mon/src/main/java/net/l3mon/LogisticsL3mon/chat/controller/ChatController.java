@@ -1,7 +1,6 @@
 package net.l3mon.LogisticsL3mon.chat.controller;
 
 import net.l3mon.LogisticsL3mon.chat.dto.ChatMessage;
-import net.l3mon.LogisticsL3mon.chat.dto.Message;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;

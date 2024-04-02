@@ -5,6 +5,8 @@ import net.l3mon.LogisticsL3mon.Server.ErrorResponse;
 import net.l3mon.LogisticsL3mon.Server.GlobalExceptionMessage;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.User;
 import net.l3mon.LogisticsL3mon.UserAuth.repository.UserRepository;
+import net.l3mon.LogisticsL3mon.company.dto.CompanyDTO;
+import net.l3mon.LogisticsL3mon.company.entity.Company;
 import net.l3mon.LogisticsL3mon.company.entity.CompanyInviteLink;
 import net.l3mon.LogisticsL3mon.company.entity.CompanyUser;
 import net.l3mon.LogisticsL3mon.company.repository.CompanyUserRepository;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -68,5 +71,38 @@ public class RoomService {
         }
 
         return rooms;
+    }
+
+    public Room create(RoomDTO room) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        User user = userRepository.findUserByLogin(username).orElse(null);
+        if (user == null) {
+            throw new GlobalExceptionMessage("User not found with username: " + username);
+        }
+
+        CompanyUser companyUser = companyUserRepository.findByUserIdAndCompanyId(user.getId(), room.getCompanyId()).orElse(null);
+        if (companyUser == null) {
+            throw new GlobalExceptionMessage("Permission fail");
+        }
+        if (!Objects.equals(companyUser.getRole(), "ADMIN")){
+            throw new GlobalExceptionMessage("Don't have permission");
+        }
+
+        Room savedRoom;
+        try {
+            Room roomCreate = new Room();
+            roomCreate.setName(room.getName());
+            roomCreate.setCompanyId(room.getCompanyId());
+            roomCreate.setPermissionForAll(room.isPermissionForAll());
+            roomCreate.setCreatedAt(String.valueOf(LocalDateTime.now()));
+
+            savedRoom = roomRepository.save(roomCreate);
+        } catch (GlobalExceptionMessage ex) {
+            throw new GlobalExceptionMessage("Room creation error: " + ex.getMessage());
+        }
+
+        return savedRoom;
     }
 }

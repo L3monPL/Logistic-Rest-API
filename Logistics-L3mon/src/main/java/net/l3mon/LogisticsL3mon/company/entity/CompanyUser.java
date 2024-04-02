@@ -24,6 +24,9 @@ public class CompanyUser {
     @Column(name = "company_id")
     private Long companyId;
 
+    @Column(name = "role")
+    private String role;
+
     @Column(name = "created_at")
     private String createdAt;
 

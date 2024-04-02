@@ -19,10 +19,10 @@ public class Company {
     private Long id;
     @Column(name = "name")
     private String name;
-    @Column(name = "shortname")
+    @Column(name = "short_name")
     private String shortName;
-    @Column(name = "isenable")
+    @Column(name = "is_enable")
     private boolean isEnable;
-    @Column(name = "createdat")
+    @Column(name = "created_at")
     private String createdAt;
 }

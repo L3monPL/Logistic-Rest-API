@@ -2,6 +2,7 @@ package net.l3mon.LogisticsL3mon.company.service;
 
 import lombok.RequiredArgsConstructor;
 import net.l3mon.LogisticsL3mon.Server.GlobalExceptionMessage;
+import net.l3mon.LogisticsL3mon.UserAuth.dto.UserToListDTO;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.User;
 import net.l3mon.LogisticsL3mon.UserAuth.repository.UserRepository;
 import net.l3mon.LogisticsL3mon.company.dto.CompanyDTO;
@@ -115,6 +116,7 @@ public class CompanyService {
             companyUser = new CompanyUser();
             companyUser.setCompanyId(savedCompany.getId());
             companyUser.setUserId(user.getId());
+            companyUser.setRole("ADMIN");
             companyUser.setCreatedAt(String.valueOf(LocalDateTime.now()));
 
             companyUserRepository.save(companyUser);
@@ -239,17 +241,58 @@ public class CompanyService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
-        User user = userRepository.findUserByLogin(username).orElse(null);
+        User user;
+        try {
+            user = userRepository.findUserByLogin(username).orElse(null);
+        } catch (GlobalExceptionMessage ex) {
+            throw new GlobalExceptionMessage("Nie udało się utworzyć firmy: " + ex.getMessage());
+        }
         if (user == null) {
             throw new GlobalExceptionMessage("User not found with username: " + username);
         }
 
-        CompanyUser companyUser = companyUserRepository.findByUserIdAndCompanyId(user.getId(), companyId).orElse(null);
+        CompanyUser companyUser;
+        try {
+            companyUser = companyUserRepository.findByUserIdAndCompanyId(user.getId(), companyId).orElse(null);
+        } catch (GlobalExceptionMessage ex) {
+            throw new GlobalExceptionMessage("Error: " + ex.getMessage());
+        }
         if (companyUser == null) {
             throw new GlobalExceptionMessage("Don't have permission");
         }
 
+        List<CompanyUser> companyUsers;
+        try {
+            companyUsers = companyUserRepository.findAllByCompanyId(companyId);
+        } catch (GlobalExceptionMessage ex) {
+            throw new GlobalExceptionMessage("Error: " + ex.getMessage());
+        }
 
-        return null;
+        List<UserToListDTO> allUserCompany = new ArrayList<>();
+
+        for (CompanyUser companyUserCurrent : companyUsers) {
+            Long userId = companyUserCurrent.getUserId();
+            String companyRole = companyUserCurrent.getRole();
+
+            User userCurrent;
+            try {
+                userCurrent = userRepository.findById(userId).orElse(null);
+            } catch (GlobalExceptionMessage ex) {
+                throw new GlobalExceptionMessage("Error: " + ex.getMessage());
+            }
+            if (userCurrent == null) {
+                throw new GlobalExceptionMessage("Error");
+            }
+
+            UserToListDTO userToListDTO = new UserToListDTO();
+            userToListDTO.setUsername(userCurrent.getUsername());
+            userToListDTO.setEmail(userCurrent.getEmail());
+            userToListDTO.setCompany_role(companyRole);
+            userToListDTO.setPhone(userCurrent.getPhone());
+
+            allUserCompany.add(userToListDTO);
+        }
+
+        return allUserCompany;
     }
 }

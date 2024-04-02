@@ -215,7 +215,7 @@ public class CompanyService {
 //                throw new GlobalExceptionMessage("The user waits for confirmation from the administrator");
                 return "The user waits for confirmation from the administrator";
             }
-            if (companyUserWaitingToJoin == null){
+//            if (companyUserWaitingToJoin == null){
                 CompanyUserWaitingToJoin companyUserWaitingToJoinCreate;
                 try{
                     companyUserWaitingToJoinCreate = new CompanyUserWaitingToJoin();
@@ -227,14 +227,26 @@ public class CompanyService {
                 }
                 companyUserWaitingToJoinRepository.save(companyUserWaitingToJoinCreate);
                 return "Waiting for confirmation from the administrator";
-            }
-        } else if (!companyInviteLink.isRequiresAcceptance()) {
+//            }
+        } else {
             if (companyUserWaitingToJoin != null) {
                 companyUserWaitingToJoinRepository.delete(companyUserWaitingToJoin);
             }
+
+            CompanyUser companyUserCreate = new CompanyUser();
+            companyUserCreate.setUserId(user.getId());
+            companyUserCreate.setCompanyId(companyInviteLink.getCompanyId());
+            companyUserCreate.setRole("MEMBER");
+            companyUserCreate.setCreatedAt(String.valueOf(LocalDateTime.now()));
+
+            try {
+                companyUserRepository.save(companyUserCreate);
+            } catch (GlobalExceptionMessage ex) {
+                throw new GlobalExceptionMessage("Error: " + ex.getMessage());
+            }
         }
 
-        return null;
+        return "User added successfully";
     }
 
     public List<?> getAllUsersCompanyById(Long companyId) throws GlobalExceptionMessage{
@@ -285,6 +297,7 @@ public class CompanyService {
             }
 
             UserToListDTO userToListDTO = new UserToListDTO();
+            userToListDTO.setId(userCurrent.getId());
             userToListDTO.setUsername(userCurrent.getUsername());
             userToListDTO.setEmail(userCurrent.getEmail());
             userToListDTO.setCompany_role(companyRole);
@@ -343,6 +356,7 @@ public class CompanyService {
             }
 
             UserToListDTO userToListDTO = new UserToListDTO();
+            userToListDTO.setId(userCurrent.getId());
             userToListDTO.setUsername(userCurrent.getUsername());
             userToListDTO.setEmail(userCurrent.getEmail());
             userToListDTO.setCompany_role("WAITING");
@@ -353,5 +367,73 @@ public class CompanyService {
 
 
         return allUserCompany;
+    }
+
+    public String acceptUserJoinToCompany(Long companyId, Long userId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        User user;
+        try {
+            user = userRepository.findUserByLogin(username).orElse(null);
+        } catch (GlobalExceptionMessage ex) {
+            throw new GlobalExceptionMessage("error: " + ex.getMessage());
+        }
+        if (user == null) {
+            throw new GlobalExceptionMessage("User not found with username: " + username);
+        }
+
+        CompanyUser companyUser;
+        try {
+            companyUser = companyUserRepository.findByUserIdAndCompanyId(user.getId(), companyId).orElse(null);
+        } catch (GlobalExceptionMessage ex) {
+            throw new GlobalExceptionMessage("Error: " + ex.getMessage());
+        }
+        if (companyUser == null) {
+            throw new GlobalExceptionMessage("Don't have permission");
+        }
+        if (!Objects.equals(companyUser.getRole(), "ADMIN")){
+            throw new GlobalExceptionMessage("Don't have permission");
+        }
+
+        CompanyUser companyUserSelectedUser;
+        try {
+            companyUserSelectedUser = companyUserRepository.findByUserIdAndCompanyId(userId, companyId).orElse(null);
+        } catch (GlobalExceptionMessage ex) {
+            throw new GlobalExceptionMessage("Error: " + ex.getMessage());
+        }
+        if (companyUserSelectedUser != null) {
+            throw new GlobalExceptionMessage("The user has already been added");
+        }
+
+        CompanyUserWaitingToJoin companyUserWaitingToJoins;
+        try {
+            companyUserWaitingToJoins = companyUserWaitingToJoinRepository.findByCompanyId(companyId).orElse(null);
+        } catch (GlobalExceptionMessage ex) {
+            throw new GlobalExceptionMessage("Error: " + ex.getMessage());
+        }
+        if (companyUserWaitingToJoins == null) {
+            throw new GlobalExceptionMessage("No user on the waiting list");
+        }
+
+        CompanyUser companyUserCreate = new CompanyUser();
+        companyUserCreate.setUserId(userId);
+        companyUserCreate.setCompanyId(companyUserWaitingToJoins.getCompanyId());
+        companyUserCreate.setRole("MEMBER");
+        companyUserCreate.setCreatedAt(String.valueOf(LocalDateTime.now()));
+
+        try {
+            companyUserRepository.save(companyUserCreate);
+        } catch (GlobalExceptionMessage ex) {
+            throw new GlobalExceptionMessage("Error: " + ex.getMessage());
+        }
+        try {
+            companyUserWaitingToJoinRepository.delete(companyUserWaitingToJoins);
+        } catch (GlobalExceptionMessage ex) {
+            companyUserRepository.delete(companyUserCreate);
+            throw new GlobalExceptionMessage("Error: " + ex.getMessage());
+        }
+
+        return "User added successfully";
     }
 }

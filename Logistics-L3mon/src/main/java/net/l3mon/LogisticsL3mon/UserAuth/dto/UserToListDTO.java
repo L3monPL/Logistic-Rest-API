@@ -8,6 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserToListDTO {
+    private Long id;
     private String username;
     private String email;
     private String phone;

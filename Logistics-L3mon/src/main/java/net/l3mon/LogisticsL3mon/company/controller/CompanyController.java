@@ -92,6 +92,16 @@ public class CompanyController {
         return ResponseEntity.ok(users);
     }
 
+    @RequestMapping(path = "/{companyId}/acceptJoin/{userId}", method = RequestMethod.POST)
+    public ResponseEntity<?>  acceptUserJoinToCompany(@PathVariable Long companyId, @PathVariable Long userId){
+        try {
+            return ResponseEntity.ok(companyService.acceptUserJoinToCompany(companyId, userId));
+        } catch (GlobalExceptionMessage ex) {
+            ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
+
     @RequestMapping(path = "/{companyId}/users", method = RequestMethod.GET)
     public ResponseEntity<?> getAllUsersCompanyById(@PathVariable Long companyId) {
         List<?> users;

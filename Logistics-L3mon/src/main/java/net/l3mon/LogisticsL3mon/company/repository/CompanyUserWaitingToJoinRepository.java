@@ -10,4 +10,6 @@ public interface CompanyUserWaitingToJoinRepository extends JpaRepository<Compan
     Optional<CompanyUserWaitingToJoin> findByUserIdAndCompanyId(Long id, Long companyId);
 
     List<CompanyUserWaitingToJoin> findAllByCompanyId(Long companyId);
+
+    Optional<CompanyUserWaitingToJoin> findByCompanyId(Long companyId);
 }

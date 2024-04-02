@@ -1,4 +1,4 @@
-package net.l3mon.LogisticsL3mon.UserAuth.configuration;
+package net.l3mon.LogisticsL3mon.Server.configuration;
 
 import net.l3mon.LogisticsL3mon.UserAuth.entity.Role;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.User;

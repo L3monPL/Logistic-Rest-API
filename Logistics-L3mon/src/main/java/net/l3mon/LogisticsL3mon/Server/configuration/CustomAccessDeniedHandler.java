@@ -1,4 +1,4 @@
-package net.l3mon.LogisticsL3mon.UserAuth.configuration;
+package net.l3mon.LogisticsL3mon.Server.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;

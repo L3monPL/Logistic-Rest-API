@@ -45,22 +45,18 @@ public class HeaderAuthenticationJwtFilter extends OncePerRequestFilter {
                     }
                 }
             }
-//            log.info("Authorization: " + authHeader);
 
             if (authHeader == null || authHeader.trim().isEmpty()) {
                 request.setAttribute(USER_AUTH_EXCEPTIONS, "Brak uprawnień");
                 filterChain.doFilter(request, response);
                 return;
             }
-            log.info(authHeader);
 
             String userLogin = parseToken(authHeader);
-            log.info("User Login: " + userLogin);
 
             User user = userRepository.findUserByLogin(userLogin).orElse(null);
 
             assert user != null;
-            log.info(String.valueOf(user.getRole()));
 
             org.springframework.security.core.userdetails.User authUser = new org.springframework.security.core.userdetails.User(
                     user.getLogin(),

@@ -102,6 +102,16 @@ public class CompanyController {
         }
     }
 
+    @RequestMapping(path = "/{companyId}/remove/{userId}", method = RequestMethod.DELETE)
+    public ResponseEntity<?>  removeUserFromCompany(@PathVariable Long companyId, @PathVariable Long userId){
+        try {
+            return ResponseEntity.ok(companyService.removeUserFromCompany(companyId, userId));
+        } catch (GlobalExceptionMessage ex) {
+            ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
+
     @RequestMapping(path = "/{companyId}/users", method = RequestMethod.GET)
     public ResponseEntity<?> getAllUsersCompanyById(@PathVariable Long companyId) {
         List<?> users;

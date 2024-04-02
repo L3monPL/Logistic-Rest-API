@@ -437,4 +437,51 @@ public class CompanyService {
 
         return new ResponseMessage("User added successfully");
     }
+
+    public Object removeUserFromCompany(Long companyId, Long userId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        User user;
+        try {
+            user = userRepository.findUserByLogin(username).orElse(null);
+        } catch (GlobalExceptionMessage ex) {
+            throw new GlobalExceptionMessage("error: " + ex.getMessage());
+        }
+        if (user == null) {
+            throw new GlobalExceptionMessage("User not found with username: " + username);
+        }
+
+        CompanyUser companyUser;
+        try {
+            companyUser = companyUserRepository.findByUserIdAndCompanyId(user.getId(), companyId).orElse(null);
+        } catch (GlobalExceptionMessage ex) {
+            throw new GlobalExceptionMessage("Error: " + ex.getMessage());
+        }
+        if (companyUser == null) {
+            throw new GlobalExceptionMessage("Don't have permission");
+        }
+        if (!Objects.equals(companyUser.getRole(), "ADMIN")){
+            throw new GlobalExceptionMessage("Don't have permission");
+        }
+
+        CompanyUser companyUserToDelete;
+        try {
+            companyUserToDelete = companyUserRepository.findByUserIdAndCompanyId(userId, companyId).orElse(null);
+        } catch (GlobalExceptionMessage ex) {
+            throw new GlobalExceptionMessage("Error: " + ex.getMessage());
+        }
+        if (companyUserToDelete == null){
+            throw new GlobalExceptionMessage("No user to delete");
+        }
+
+        try {
+            companyUserRepository.delete(companyUserToDelete);
+        } catch (GlobalExceptionMessage ex) {
+            throw new GlobalExceptionMessage("Error: " + ex.getMessage());
+        }
+
+
+        return new ResponseMessage("User removed successfully");
+    }
 }

@@ -13,6 +13,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor
@@ -33,9 +34,9 @@ public class ChatRoomWSController {
     }
 //    @SubscribeMapping("/room/{roomId}/connect")
     @MessageMapping("/ws/room/{roomId}/message")
-    public void connectToRoom(@DestinationVariable Long roomId, Authentication authentication) {
+    public void connectToRoom(@DestinationVariable Long roomId, Authentication authentication, @Payload int page) {
         try {
-            chatRoomService.connectToRoom(roomId, authentication, messagingTemplate, 0, 10);
+            chatRoomService.connectToRoom(roomId, authentication, messagingTemplate, page, 10);
         } catch (GlobalExceptionMessage ex) {
 //            return new ErrorResponse(ex.getMessage());
         }

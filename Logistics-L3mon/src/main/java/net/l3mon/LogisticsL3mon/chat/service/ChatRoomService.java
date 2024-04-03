@@ -97,12 +97,10 @@ public class ChatRoomService {
             throw new GlobalExceptionMessage("User not found with username: " + username);
         }
 
-        // Oblicz numer strony, aby zwrócić ostatnie wiadomości
         int totalPages = (int) Math.ceil(chatRoomRepository.countByRoomId(roomId) / (double) size);
         int lastPage = Math.max(0, totalPages - 1);
-        int requestedPage = Math.min(page, lastPage); // Jeśli zostanie podana strona większa niż ostatnia, użyj ostatniej strony
+        int requestedPage = Math.min(page, lastPage);
 
-        // Sortowanie po dacie w kolejności malejącej, aby uzyskać najnowsze wiadomości na początku
         Pageable pageable = PageRequest.of(requestedPage, size, Sort.by("createdAt").descending());
         List<ChatRoom> messages = chatRoomRepository.findByRoomId(roomId, pageable).getContent();
 

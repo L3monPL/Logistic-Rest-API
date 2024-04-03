@@ -12,10 +12,13 @@ import net.l3mon.LogisticsL3mon.company.entity.CompanyUser;
 import net.l3mon.LogisticsL3mon.company.repository.CompanyUserRepository;
 import net.l3mon.LogisticsL3mon.room.entity.Room;
 import net.l3mon.LogisticsL3mon.room.repository.RoomRepository;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -75,5 +78,23 @@ public class ChatRoomService {
         }
 
         return chatRoom;
+    }
+
+    public void connectToRoom(Long roomId, Authentication authentication, SimpMessagingTemplate messagingTemplate) {
+        String username = authentication.getName();
+
+        User user;
+        try {
+            user = userRepository.findUserByLogin(username).orElse(null);
+        } catch (GlobalExceptionMessage ex) {
+            throw new GlobalExceptionMessage("error: " + ex.getMessage());
+        }
+        if (user == null) {
+            throw new GlobalExceptionMessage("User not found with username: " + username);
+        }
+
+        List<ChatRoom> messages = chatRoomRepository.findByRoomId(roomId);
+
+        messagingTemplate.convertAndSendToUser(username, "/topic/room/" + roomId, messages);
     }
 }

@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.User;
 import net.l3mon.LogisticsL3mon.UserAuth.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -21,12 +22,16 @@ import java.util.Collections;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class HeaderAuthenticationJwtFilter extends OncePerRequestFilter {
 
     private final UserRepository userRepository;
-    public final String SECRET = "AD01FDF92498FF62C1B9E7E9193CCCCE8EAB8E50CEE980BC7BD72FB9A49B5262";
+
+    public HeaderAuthenticationJwtFilter(UserRepository userRepository, @Value("${jwt.secret}") String secret){
+        this.userRepository = userRepository;
+        SECRET = secret;
+    }
+    public final String SECRET;
     public static final String USER = "USER";
     public static final String USER_AUTH_EXCEPTIONS = "USER_AUTH_EXCEPTIONS";
 

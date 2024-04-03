@@ -32,10 +32,10 @@ public class ChatRoomWSController {
         }
     }
 //    @SubscribeMapping("/room/{roomId}/connect")
-    @MessageMapping("/ws/room/{roomId}/connect")
+    @MessageMapping("/ws/room/{roomId}/message")
     public void connectToRoom(@DestinationVariable Long roomId, Authentication authentication) {
         try {
-            chatRoomService.connectToRoom(roomId, authentication, messagingTemplate);
+            chatRoomService.connectToRoom(roomId, authentication, messagingTemplate, 0, 10);
         } catch (GlobalExceptionMessage ex) {
 //            return new ErrorResponse(ex.getMessage());
         }

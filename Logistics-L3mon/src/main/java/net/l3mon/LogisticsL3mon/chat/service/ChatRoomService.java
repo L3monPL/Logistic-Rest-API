@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import net.l3mon.LogisticsL3mon.Server.GlobalExceptionMessage;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.User;
 import net.l3mon.LogisticsL3mon.UserAuth.repository.UserRepository;
-import net.l3mon.LogisticsL3mon.chat.dto.ChatMessage;
 import net.l3mon.LogisticsL3mon.chat.dto.ChatRoomDTO;
 import net.l3mon.LogisticsL3mon.chat.entity.ChatRoom;
 import net.l3mon.LogisticsL3mon.chat.repository.ChatRoomRepository;
@@ -12,12 +11,15 @@ import net.l3mon.LogisticsL3mon.company.entity.CompanyUser;
 import net.l3mon.LogisticsL3mon.company.repository.CompanyUserRepository;
 import net.l3mon.LogisticsL3mon.room.entity.Room;
 import net.l3mon.LogisticsL3mon.room.repository.RoomRepository;
-import org.springframework.messaging.Message;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -80,8 +82,10 @@ public class ChatRoomService {
         return chatRoom;
     }
 
-    public void connectToRoom(Long roomId, Authentication authentication, SimpMessagingTemplate messagingTemplate) {
+    public void connectToRoom(Long roomId, Authentication authentication, SimpMessagingTemplate messagingTemplate, int page, int size) {
         String username = authentication.getName();
+
+        System.out.println(page);
 
         User user;
         try {
@@ -93,8 +97,19 @@ public class ChatRoomService {
             throw new GlobalExceptionMessage("User not found with username: " + username);
         }
 
-        List<ChatRoom> messages = chatRoomRepository.findByRoomId(roomId);
+        // Oblicz numer strony, aby zwrócić ostatnie wiadomości
+        int totalPages = (int) Math.ceil(chatRoomRepository.countByRoomId(roomId) / (double) size);
+        int lastPage = Math.max(0, totalPages - 1);
+        int requestedPage = Math.min(page, lastPage); // Jeśli zostanie podana strona większa niż ostatnia, użyj ostatniej strony
 
-        messagingTemplate.convertAndSendToUser(username, "/topic/room/" + roomId, messages);
+        // Sortowanie po dacie w kolejności malejącej, aby uzyskać najnowsze wiadomości na początku
+        Pageable pageable = PageRequest.of(requestedPage, size, Sort.by("createdAt").descending());
+        List<ChatRoom> messages = chatRoomRepository.findByRoomId(roomId, pageable).getContent();
+
+        List<ChatRoom> mutableMessages = new ArrayList<>(messages);
+        Collections.reverse(mutableMessages);
+
+
+        messagingTemplate.convertAndSendToUser(username, "/topic/room/" + roomId, mutableMessages);
     }
 }

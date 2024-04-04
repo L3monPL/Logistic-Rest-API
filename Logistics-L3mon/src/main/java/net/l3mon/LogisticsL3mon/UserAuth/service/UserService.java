@@ -18,6 +18,7 @@ import net.l3mon.LogisticsL3mon.UserAuth.entity.User;
 import net.l3mon.LogisticsL3mon.UserAuth.repository.UserRepository;
 import net.l3mon.LogisticsL3mon.company.repository.CompanyRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
@@ -112,12 +113,18 @@ public class UserService {
         saveUser(user);
     }
 
-    public ResponseEntity<?> login(HttpServletResponse response, User authRequest) {
+    public ResponseEntity<?> login(HttpServletResponse response, User authRequest) throws GlobalExceptionMessage{
         User user = userRepository.findUserByLogin(authRequest.getUsername()).orElse(null);
         if (user != null) {
             System.out.println(user);
-            Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
-//            System.out.println(user);
+//            Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+            Authentication authenticate;
+            try {
+                authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+            } catch (AuthenticationException e) {
+                throw new GlobalExceptionMessage("Nie udało się zalogować");
+            }
+            System.out.println(authenticate);
             if (authenticate.isAuthenticated()) {
                 Cookie refresh = cookiService.generateCookie("refresh", generateToken(authRequest.getUsername(),refreshExp), refreshExp);
                 Cookie cookie = cookiService.generateCookie("Authorization", generateToken(authRequest.getUsername(),exp), exp);
@@ -137,10 +144,10 @@ public class UserService {
 
 
             } else {
-                return ResponseEntity.ok(new AuthResponse(Code.A1));
+                throw new GlobalExceptionMessage("Nie udało się zalogować");
             }
         }
-        return ResponseEntity.ok(new AuthResponse(Code.A2));
+        throw new GlobalExceptionMessage("Nie udało się zalogować");
     }
 
     public void setAsAdmin(UserRegisterDTO user) {

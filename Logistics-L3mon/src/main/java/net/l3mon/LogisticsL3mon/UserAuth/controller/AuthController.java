@@ -30,7 +30,12 @@ public class AuthController {
     @RequestMapping(path = "/login",method = RequestMethod.POST)
     public ResponseEntity<?> login(@RequestBody User user, HttpServletResponse response){
         log.info("--TRY LOGIN USER");
-        return userService.login(response,user);
+        try {
+            return userService.login(response,user);
+        } catch (GlobalExceptionMessage ex) {
+            ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
     }
 
     @RequestMapping(path = "/register", method = RequestMethod.POST)

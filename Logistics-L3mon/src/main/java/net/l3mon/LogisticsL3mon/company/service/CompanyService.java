@@ -310,7 +310,7 @@ public class CompanyService {
         return allUserCompany;
     }
 
-    public List<?> getAllUsersWaitingToJoinCompany(Long companyId) {
+    public List<?> getAllUsersWaitingToJoinCompany(Long companyId) throws GlobalExceptionMessage{
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
@@ -370,7 +370,7 @@ public class CompanyService {
         return allUserCompany;
     }
 
-    public ResponseMessage acceptUserJoinToCompany(Long companyId, Long userId) {
+    public ResponseMessage acceptUserJoinToCompany(Long companyId, Long userId) throws GlobalExceptionMessage{
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
@@ -438,7 +438,7 @@ public class CompanyService {
         return new ResponseMessage("User added successfully");
     }
 
-    public Object removeUserFromCompany(Long companyId, Long userId) {
+    public Object removeUserFromCompany(Long companyId, Long userId) throws GlobalExceptionMessage{
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 

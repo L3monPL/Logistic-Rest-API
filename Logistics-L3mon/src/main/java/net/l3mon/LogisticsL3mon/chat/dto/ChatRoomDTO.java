@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class ChatRoomDTO {
-    private Long userId;
+//    private Long userId;
     private String message;
     private Long fileId;
     private Long replyToId;

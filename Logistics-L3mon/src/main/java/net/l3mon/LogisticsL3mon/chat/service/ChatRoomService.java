@@ -66,7 +66,7 @@ public class ChatRoomService {
 
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setRoomId(roomId);
-        chatRoom.setUserId(chatRoomDTO.getUserId());
+        chatRoom.setUserId(user.getId());
         chatRoom.setMessage(chatRoomDTO.getMessage());
         chatRoom.setFileId(chatRoomDTO.getFileId());
         chatRoom.setReplyToId(chatRoomDTO.getReplyToId());
@@ -85,7 +85,7 @@ public class ChatRoomService {
     public void connectToRoom(Long roomId, Authentication authentication, SimpMessagingTemplate messagingTemplate, int page, int size) {
         String username = authentication.getName();
 
-        System.out.println(page);
+//        System.out.println(page);
 
         User user;
         try {
@@ -106,6 +106,9 @@ public class ChatRoomService {
 
         List<ChatRoom> mutableMessages = new ArrayList<>(messages);
         Collections.reverse(mutableMessages);
+
+//        System.out.println(messages);
+//        System.out.println(mutableMessages);
 
 
         messagingTemplate.convertAndSendToUser(username, "/topic/room/" + roomId, mutableMessages);

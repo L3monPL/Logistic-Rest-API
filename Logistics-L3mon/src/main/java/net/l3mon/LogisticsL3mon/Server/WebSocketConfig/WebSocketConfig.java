@@ -26,6 +26,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -58,47 +59,34 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registration.interceptors(new ChannelInterceptorAdapter() {
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+                StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
                 if (StompCommand.CONNECT.equals(accessor.getCommand())) {
 //                    String token = accessor.getFirstNativeHeader("Authorization");
-                    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJMM21vbiIsImlhdCI6MTcxMjExNjE5NSwiZXhwIjoxNzEyNzIwOTk1fQ.cG9JycJY84hVxKvgNj7407dGsqWz7akVluDoQyYryfA";
-                    List<String> cookieHeaders = accessor.getNativeHeader("Cookie");
-
-                    System.out.println(cookieHeaders);
-                    System.out.println(token);
-                    if (token != null && token.startsWith("Bearer ")) {
-                        if (parseToken(token) != null) {
-
-                            String userLogin = parseToken(token);
-
-                            System.out.println(userLogin);
-
-                            User user = userRepository.findUserByLogin(userLogin).orElse(null);
-
+//                    System.out.println(token);
+//                    System.out.println(Objects.requireNonNull(accessor.getUser()).getName());
+                    String username = Objects.requireNonNull(accessor.getUser()).getName();
+                    if (username != null) {
+//                        if (parseToken(token) != null) {
+//                            String userLogin = parseToken(token);
+//                            System.out.println(userLogin);
+                            User user = userRepository.findUserByLogin(username).orElse(null);
                             assert user != null;
-
                             org.springframework.security.core.userdetails.User authUser = new org.springframework.security.core.userdetails.User(
                                     user.getLogin(),
                                     user.getPassword(),
                                     Collections.singletonList(new SimpleGrantedAuthority(user.getRole().toString()))
                             );
-//
                             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                                     authUser,
                                     null,
                                     authUser.getAuthorities()
                             );
-
                             SecurityContextHolder.getContext().setAuthentication(authentication);
                             accessor.setUser(authentication);
-
-//                            Authentication auth = jwtTokenProvider.getAuthentication(jwtToken);
-//                            SecurityContextHolder.getContext().setAuthentication(auth);
-//                            accessor.setUser(auth);
-                        }
+//                        }
                     }
                 }
-                return message;
+                return super.preSend(message, channel);
             }
         });
     }

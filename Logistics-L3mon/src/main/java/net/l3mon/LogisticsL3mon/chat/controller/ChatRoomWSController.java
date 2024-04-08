@@ -36,7 +36,7 @@ public class ChatRoomWSController {
     @MessageMapping("/ws/room/{roomId}/message")
     public void connectToRoom(@DestinationVariable Long roomId, Authentication authentication, @Payload int page) {
         try {
-            chatRoomService.connectToRoom(roomId, authentication, messagingTemplate, page, 10);
+            chatRoomService.connectToRoom(roomId, authentication, messagingTemplate, page, 25);
         } catch (GlobalExceptionMessage ex) {
 //            return new ErrorResponse(ex.getMessage());
         }

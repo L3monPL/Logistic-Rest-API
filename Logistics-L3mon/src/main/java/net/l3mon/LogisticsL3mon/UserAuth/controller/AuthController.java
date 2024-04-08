@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.l3mon.LogisticsL3mon.Server.ErrorResponse;
 import net.l3mon.LogisticsL3mon.Server.GlobalExceptionMessage;
+import net.l3mon.LogisticsL3mon.UserAuth.dto.UserDetailsDTO;
 import net.l3mon.LogisticsL3mon.UserAuth.dto.UserRegisterDTO;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.AuthResponse;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.Code;
@@ -47,6 +48,18 @@ public class AuthController {
             ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
+    }
+
+    @RequestMapping(path = "/user",method = RequestMethod.GET)
+    public ResponseEntity<?> getUser(){
+        UserDetailsDTO user;
+        try {
+            user = userService.getUser();
+        } catch (GlobalExceptionMessage ex) {
+            ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+        return ResponseEntity.ok(user);
     }
 
     @RequestMapping(path = "/validate", method = RequestMethod.GET)

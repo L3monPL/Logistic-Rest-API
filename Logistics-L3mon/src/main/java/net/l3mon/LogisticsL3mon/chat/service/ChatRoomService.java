@@ -34,6 +34,8 @@ public class ChatRoomService {
     public ChatRoom sendMessageToRoomId(Long roomId, ChatRoomDTO chatRoomDTO, Authentication authentication) throws GlobalExceptionMessage {
         String username = authentication.getName();
 
+        System.out.println(username);
+
         User user;
         try {
             user = userRepository.findUserByLogin(username).orElse(null);

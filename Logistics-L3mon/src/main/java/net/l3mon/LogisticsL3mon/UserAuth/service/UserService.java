@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.l3mon.LogisticsL3mon.Server.CookiService;
 import net.l3mon.LogisticsL3mon.Server.JwtService;
 import net.l3mon.LogisticsL3mon.Server.GlobalExceptionMessage;
+import net.l3mon.LogisticsL3mon.UserAuth.dto.UserDetailsDTO;
 import net.l3mon.LogisticsL3mon.UserAuth.dto.UserLoginDTO;
 import net.l3mon.LogisticsL3mon.UserAuth.dto.UserRegisterDTO;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.AuthResponse;
@@ -19,6 +20,7 @@ import net.l3mon.LogisticsL3mon.UserAuth.repository.UserRepository;
 import net.l3mon.LogisticsL3mon.company.repository.CompanyRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
@@ -158,4 +160,30 @@ public class UserService {
     }
 
 
+    public UserDetailsDTO getUser() throws GlobalExceptionMessage{
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        User user;
+        try {
+            user = userRepository.findUserByLogin(username).orElse(null);
+        } catch (GlobalExceptionMessage ex) {
+            throw new GlobalExceptionMessage("error: " + ex.getMessage());
+        }
+        if (user == null) {
+            throw new GlobalExceptionMessage("User not found with username: " + username);
+        }
+
+        UserDetailsDTO userDetailsDTO = new UserDetailsDTO();
+
+        userDetailsDTO.setId(user.getId());
+        userDetailsDTO.setLogin(user.getLogin());
+        userDetailsDTO.setEmail(user.getEmail());
+        userDetailsDTO.setRole(user.getRole());
+        userDetailsDTO.setPhone(user.getPhone());
+        userDetailsDTO.setEnabled(user.isEnabled());
+        userDetailsDTO.setLock(user.isLock());
+
+        return userDetailsDTO;
+    }
 }

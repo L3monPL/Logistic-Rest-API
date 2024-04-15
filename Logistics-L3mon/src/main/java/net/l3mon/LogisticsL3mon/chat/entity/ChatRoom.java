@@ -24,7 +24,7 @@ public class ChatRoom {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "message")
+    @Column(name = "message", columnDefinition = "TEXT")
     private String message;
 
     @Column(name = "file_id")

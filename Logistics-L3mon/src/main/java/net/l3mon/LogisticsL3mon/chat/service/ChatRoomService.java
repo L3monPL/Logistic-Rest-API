@@ -113,7 +113,34 @@ public class ChatRoomService {
         List<ChatRoom> mutableMessages = new ArrayList<>(messages);
         Collections.reverse(mutableMessages);
 
-        messagingTemplate.convertAndSendToUser(username, "/topic/room/" + roomId, mutableMessages);
+        List<Object> messagesWithData = new ArrayList<>();
+
+        for (ChatRoom chatRoom: mutableMessages){
+            if (chatRoom.getFileId() == null){
+                messagesWithData.add(chatRoom);
+            }
+            if (chatRoom.getFileId() != null){
+                File file = fileRepository.getReferenceById(chatRoom.getFileId());
+                if (file != null){
+                    if (Objects.equals(file.getType(), "image/jpeg") || Objects.equals(file.getType(), "image/png")){
+//                    if (isImage(file.getType())){
+                        System.out.println("wykryto obrazek");
+//                    }
+                    }
+                }
+//                ChatRoom chatRoomWithImage
+////                messagesWithData.add(chatRoom);
+            }
+        }
+
+//        System.out.println(messages);
+//        System.out.println(mutableMessages);
+
+
+        messagingTemplate.convertAndSendToUser(username, "/topic/room/" + roomId, messagesWithData);
     }
 
+    public static boolean isImage(String mimeType) {
+        return mimeType != null && (mimeType.equals("image/jpeg") || mimeType.equals("image/png") || mimeType.equals("image/gif") || mimeType.equals("image/bmp") || mimeType.equals("image/svg"));
+    }
 }

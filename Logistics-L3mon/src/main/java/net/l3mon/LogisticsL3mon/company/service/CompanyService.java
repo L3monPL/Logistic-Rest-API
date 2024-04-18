@@ -39,7 +39,7 @@ public class CompanyService {
     //////////////////////////////////////////////////////////////////////////////////
     private boolean isNullOrEmpty(String str) {
     return str == null || str.isEmpty();
-}
+    }
     private String generateUniqueCode() {
         StringBuilder codeBuilder = new StringBuilder();
         Random random = new SecureRandom();

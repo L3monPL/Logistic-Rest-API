@@ -9,8 +9,11 @@ import net.l3mon.LogisticsL3mon.chat.entity.ChatRoom;
 import net.l3mon.LogisticsL3mon.chat.repository.ChatRoomRepository;
 import net.l3mon.LogisticsL3mon.company.entity.CompanyUser;
 import net.l3mon.LogisticsL3mon.company.repository.CompanyUserRepository;
+import net.l3mon.LogisticsL3mon.file.entity.File;
+import net.l3mon.LogisticsL3mon.file.repository.FileRepository;
 import net.l3mon.LogisticsL3mon.room.entity.Room;
 import net.l3mon.LogisticsL3mon.room.repository.RoomRepository;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +34,7 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final UserRepository userRepository;
     private final CompanyUserRepository companyUserRepository;
+    private final FileRepository fileRepository;
 
     public ChatRoom sendMessageToRoomId(Long roomId, ChatRoomDTO chatRoomDTO, Authentication authentication) throws GlobalExceptionMessage {
         String username = authentication.getName();
@@ -84,10 +89,9 @@ public class ChatRoomService {
         return chatRoom;
     }
 
-    public void connectToRoom(Long roomId, Authentication authentication, SimpMessagingTemplate messagingTemplate, int page, int size) {
+    public void getMessages(Long roomId, Authentication authentication, SimpMessagingTemplate messagingTemplate, int page, int size) {
         String username = authentication.getName();
 
-//        System.out.println(page);
 
         User user;
         try {
@@ -109,10 +113,7 @@ public class ChatRoomService {
         List<ChatRoom> mutableMessages = new ArrayList<>(messages);
         Collections.reverse(mutableMessages);
 
-//        System.out.println(messages);
-//        System.out.println(mutableMessages);
-
-
         messagingTemplate.convertAndSendToUser(username, "/topic/room/" + roomId, mutableMessages);
     }
+
 }

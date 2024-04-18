@@ -10,6 +10,7 @@ import lombok.*;
 public class FileDTO {
     private String filename;
     private Long size;
+    private String type;
     private byte[] data;
     private String createdAt;
 }

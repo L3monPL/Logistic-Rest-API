@@ -24,6 +24,9 @@ public class File {
     @Column(name = "size")
     private Long size;
 
+    @Column(name = "type")
+    private String type;
+
     @Column(name = "data", nullable = false)
     private byte[] data;
 

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import net.l3mon.LogisticsL3mon.Server.GlobalExceptionMessage;
 import net.l3mon.LogisticsL3mon.UserAuth.entity.User;
 import net.l3mon.LogisticsL3mon.UserAuth.repository.UserRepository;
+import net.l3mon.LogisticsL3mon.chat.dto.ChatMessageWithFileDTO;
 import net.l3mon.LogisticsL3mon.chat.dto.ChatRoomDTO;
 import net.l3mon.LogisticsL3mon.chat.entity.ChatRoom;
 import net.l3mon.LogisticsL3mon.chat.repository.ChatRoomRepository;
@@ -120,13 +121,27 @@ public class ChatRoomService {
                 messagesWithData.add(chatRoom);
             }
             if (chatRoom.getFileId() != null){
-                File file = fileRepository.getReferenceById(chatRoom.getFileId());
+                File file = fileRepository.findById(chatRoom.getFileId()).orElse(null);
                 if (file != null){
-                    if (Objects.equals(file.getType(), "image/jpeg") || Objects.equals(file.getType(), "image/png")){
-//                    if (isImage(file.getType())){
-                        System.out.println("wykryto obrazek");
-//                    }
+//                    if (Objects.equals(file.getType(), "image/jpeg") || Objects.equals(file.getType(), "image/png")){
+                    if (isImage(file.getType())){
+                        System.out.println(file);
+
+                        ChatMessageWithFileDTO chatMessageWithFileDTO = new ChatMessageWithFileDTO();
+
+                        chatMessageWithFileDTO.setId(chatRoom.getId());
+                        chatMessageWithFileDTO.setRoomId(chatRoom.getRoomId());
+                        chatMessageWithFileDTO.setUserId(chatRoom.getUserId());
+                        chatMessageWithFileDTO.setMessage(chatRoom.getMessage());
+                        chatMessageWithFileDTO.setFileId(chatRoom.getFileId());
+                        chatMessageWithFileDTO.setFile(file);
+                        chatMessageWithFileDTO.setReplyToId(chatRoom.getReplyToId());
+                        chatMessageWithFileDTO.setEdited(chatRoom.isEdited());
+                        chatMessageWithFileDTO.setCreatedAt(chatRoom.getCreatedAt());
+
+                        messagesWithData.add(chatMessageWithFileDTO);
                     }
+//                    }
                 }
 //                ChatRoom chatRoomWithImage
 ////                messagesWithData.add(chatRoom);

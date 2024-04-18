@@ -16,6 +16,7 @@ public class ChatMessageWithFileDTO {
     private Long roomId;
     private Long userId;
     private String message;
+    private Long fileId;
     private File file;
     private Long replyToId;
     private boolean isEdited;

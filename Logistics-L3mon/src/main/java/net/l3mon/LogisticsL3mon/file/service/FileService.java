@@ -21,9 +21,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -75,13 +78,48 @@ public class FileService {
             throw new GlobalExceptionMessage("Don't have permission");
         }
 
+//        int targetSize =
+        int maxWidth = 20000;
         File fileDTO = new File();
 
-        fileDTO.setFilename(multipartFile.getOriginalFilename());
-        fileDTO.setData(multipartFile.getBytes());
-        fileDTO.setSize(multipartFile.getSize());
-        fileDTO.setType(multipartFile.getContentType());
-        fileDTO.setCreatedAt(String.valueOf(LocalDateTime.now()));
+        try {
+            BufferedImage originalImage = ImageIO.read(multipartFile.getInputStream());
+            int width = originalImage.getWidth();
+            int height = originalImage.getHeight();
+
+            // Obliczenie wysokości na podstawie proporcji
+            int scaledWidth = maxWidth;
+            int scaledHeight = (int) ((float) height / width * maxWidth);
+
+            // Przeskalowanie obrazu
+            BufferedImage resizedImage = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_RGB);
+            resizedImage.createGraphics().drawImage(originalImage.getScaledInstance(scaledWidth, scaledHeight, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
+
+            // Konwersja obrazu do tablicy bajtów z uwzględnieniem jakości
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            String format = Objects.requireNonNull(multipartFile.getContentType()).split("/")[1];
+            ImageIO.write(resizedImage, format, baos);
+            byte[] imageBytes = baos.toByteArray();
+
+            //Zapisanie obrazu w bazie danych
+
+
+            fileDTO.setFilename(multipartFile.getOriginalFilename());
+            fileDTO.setData(imageBytes);
+            fileDTO.setSize(multipartFile.getSize());
+            fileDTO.setType(multipartFile.getContentType());
+            fileDTO.setCreatedAt(String.valueOf(LocalDateTime.now()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//        File fileDTO = new File();
+//
+//        fileDTO.setFilename(multipartFile.getOriginalFilename());
+//        fileDTO.setData(multipartFile.getBytes());
+//        fileDTO.setSize(multipartFile.getSize());
+//        fileDTO.setType(multipartFile.getContentType());
+//        fileDTO.setCreatedAt(String.valueOf(LocalDateTime.now()));
 
         File savedFile;
         try {
@@ -119,6 +157,7 @@ public class FileService {
 
 //        return
     }
+
 
     public static boolean isImage(String mimeType) {
         return mimeType != null && (mimeType.equals("image/jpeg") || mimeType.equals("image/png") || mimeType.equals("image/gif") || mimeType.equals("image/bmp") || mimeType.equals("image/svg"));

@@ -79,24 +79,37 @@ public class FileService {
             throw new GlobalExceptionMessage("Don't have permission");
         }
 
-//        int targetSize =
-        int maxWidth = 20000;
         File fileDTO = new File();
 
-        try {
-        BufferedImage originalImage = ImageIO.read(multipartFile.getInputStream());
+        if (isImage(multipartFile)){
+            try {
+                BufferedImage originalImage = ImageIO.read(multipartFile.getInputStream());
 
-
-            fileDTO.setFilename(multipartFile.getOriginalFilename());
-            fileDTO.setWidth(originalImage.getWidth());
-            fileDTO.setHeight(originalImage.getHeight());
-            fileDTO.setData(multipartFile.getBytes());
-            fileDTO.setSize(multipartFile.getSize());
-            fileDTO.setType(multipartFile.getContentType());
-            fileDTO.setCreatedAt(String.valueOf(LocalDateTime.now()));
-        } catch (IOException e) {
-            e.printStackTrace();
+                fileDTO.setFilename(multipartFile.getOriginalFilename());
+                fileDTO.setWidth(originalImage.getWidth());
+                fileDTO.setHeight(originalImage.getHeight());
+                fileDTO.setData(multipartFile.getBytes());
+                fileDTO.setSize(multipartFile.getSize());
+                fileDTO.setType(multipartFile.getContentType());
+                fileDTO.setCreatedAt(String.valueOf(LocalDateTime.now()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+        if (!isImage(multipartFile)){
+            try {
+
+                fileDTO.setFilename(multipartFile.getOriginalFilename());
+                fileDTO.setData(multipartFile.getBytes());
+                fileDTO.setSize(multipartFile.getSize());
+                fileDTO.setType(multipartFile.getContentType());
+                fileDTO.setCreatedAt(String.valueOf(LocalDateTime.now()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
 
 //        File fileDTO = new File();
 //
@@ -145,10 +158,17 @@ public class FileService {
 //        return
     }
 
+    public static boolean isImage(MultipartFile file) {
+        // Pobranie MIME type z pliku
+        String contentType = file.getContentType();
 
-    public static boolean isImage(String mimeType) {
-        return mimeType != null && (mimeType.equals("image/jpeg") || mimeType.equals("image/png") || mimeType.equals("image/gif") || mimeType.equals("image/bmp") || mimeType.equals("image/svg"));
+        // Sprawdzenie, czy MIME type wskazuje na obraz
+        return contentType != null && contentType.startsWith("image");
     }
+
+//    public static boolean isImage(String mimeType) {
+//        return mimeType != null && (mimeType.equals("image/jpeg") || mimeType.equals("image/png") || mimeType.equals("image/gif") || mimeType.equals("image/bmp") || mimeType.equals("image/svg"));
+//    }
 
     public File getFileById(Long fileId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

@@ -123,9 +123,7 @@ public class ChatRoomService {
             if (chatRoom.getFileId() != null){
                 File file = fileRepository.findById(chatRoom.getFileId()).orElse(null);
                 if (file != null){
-//                    if (Objects.equals(file.getType(), "image/jpeg") || Objects.equals(file.getType(), "image/png")){
                     if (isImage(file.getType())){
-                        System.out.println(file);
 
                         ChatMessageWithFileDTO chatMessageWithFileDTO = new ChatMessageWithFileDTO();
 
@@ -142,16 +140,26 @@ public class ChatRoomService {
 
                         messagesWithData.add(chatMessageWithFileDTO);
                     }
-//                    }
+                    if (!isImage(file.getType())){
+
+                        ChatMessageWithFileDTO chatMessageWithFileDTO = new ChatMessageWithFileDTO();
+
+                        chatMessageWithFileDTO.setId(chatRoom.getId());
+                        chatMessageWithFileDTO.setRoomId(chatRoom.getRoomId());
+                        chatMessageWithFileDTO.setUserId(chatRoom.getUserId());
+                        chatMessageWithFileDTO.setMessage(chatRoom.getMessage());
+                        chatMessageWithFileDTO.setFileId(chatRoom.getFileId());
+//                        chatMessageWithFileDTO.setImageWidth(file.getWidth());
+//                        chatMessageWithFileDTO.setImageHeight(file.getHeight());
+                        chatMessageWithFileDTO.setReplyToId(chatRoom.getReplyToId());
+                        chatMessageWithFileDTO.setEdited(chatRoom.isEdited());
+                        chatMessageWithFileDTO.setCreatedAt(chatRoom.getCreatedAt());
+
+                        messagesWithData.add(chatMessageWithFileDTO);
+                    }
                 }
-//                ChatRoom chatRoomWithImage
-////                messagesWithData.add(chatRoom);
             }
         }
-
-//        System.out.println(messages);
-//        System.out.println(mutableMessages);
-
 
         messagingTemplate.convertAndSendToUser(username, "/topic/room/" + roomId, messagesWithData);
     }

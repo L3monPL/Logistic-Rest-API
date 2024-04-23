@@ -27,7 +27,7 @@ public class FileController {
     private final SimpMessagingTemplate messagingTemplate;
 
     @RequestMapping(path = "/{roomId}/upload", method = RequestMethod.POST)
-    public void uploadFile(@PathVariable Long roomId, @RequestPart(value = "file") MultipartFile file, @RequestParam("message") String message) {
+    public void uploadFile(@PathVariable Long roomId, @RequestPart(value = "file") MultipartFile file, @RequestParam(value = "message", required = false) String message) {
         try {
             fileService.uploadFile(roomId, file, message, messagingTemplate);
         } catch (GlobalExceptionMessage | IOException ex) {

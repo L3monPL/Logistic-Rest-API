@@ -128,17 +128,19 @@ public class FileService {
             throw new GlobalExceptionMessage("Error: " + ex.getMessage());
         }
 
-        FileWithMessageDTO fileWithMessageDTO = new FileWithMessageDTO();
+        ChatMessageWithFileDTO chatMessageWithFileDTO = new ChatMessageWithFileDTO();
 
-        fileWithMessageDTO.setRoomId(roomId);
-        fileWithMessageDTO.setUserId(user.getId());
-        fileWithMessageDTO.setMessage(message);
-        fileWithMessageDTO.setFile(savedFile);
+        chatMessageWithFileDTO.setRoomId(roomId);
+        chatMessageWithFileDTO.setUserId(user.getId());
+        chatMessageWithFileDTO.setMessage(message);
+        chatMessageWithFileDTO.setFileId(savedFile.getId());
+        chatMessageWithFileDTO.setImageWidth(savedFile.getWidth());
+        chatMessageWithFileDTO.setImageHeight(savedFile.getHeight());
 //        chatMessageWithFileDTO.setReplyToId(chatRoomDTO.getReplyToId());
-        fileWithMessageDTO.setEdited(false);
-        fileWithMessageDTO.setCreatedAt(String.valueOf(LocalDateTime.now()));
+        chatMessageWithFileDTO.setEdited(false);
+        chatMessageWithFileDTO.setCreatedAt(String.valueOf(LocalDateTime.now()));
 
-        messagingTemplate.convertAndSend("/topic/room/" + roomId, fileWithMessageDTO);
+        messagingTemplate.convertAndSend("/topic/room/" + roomId, chatMessageWithFileDTO);
 
 //        return
     }

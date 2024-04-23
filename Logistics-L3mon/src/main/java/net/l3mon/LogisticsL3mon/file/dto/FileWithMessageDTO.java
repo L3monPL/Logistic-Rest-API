@@ -1,6 +1,5 @@
-package net.l3mon.LogisticsL3mon.chat.dto;
+package net.l3mon.LogisticsL3mon.file.dto;
 
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,14 +10,13 @@ import net.l3mon.LogisticsL3mon.file.entity.File;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatMessageWithFileDTO {
+public class FileWithMessageDTO {
     private Long id;
     private Long roomId;
     private Long userId;
     private String message;
     private Long fileId;
-    private int imageWidth;
-    private int imageHeight;
+    private File file;
     private Long replyToId;
     private boolean isEdited;
     private String createdAt;

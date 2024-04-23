@@ -11,6 +11,7 @@ import net.l3mon.LogisticsL3mon.chat.repository.ChatRoomRepository;
 import net.l3mon.LogisticsL3mon.company.entity.CompanyUser;
 import net.l3mon.LogisticsL3mon.company.repository.CompanyUserRepository;
 import net.l3mon.LogisticsL3mon.file.dto.FileDTO;
+import net.l3mon.LogisticsL3mon.file.dto.FileWithMessageDTO;
 import net.l3mon.LogisticsL3mon.file.entity.File;
 import net.l3mon.LogisticsL3mon.file.repository.FileRepository;
 import net.l3mon.LogisticsL3mon.room.entity.Room;
@@ -83,29 +84,13 @@ public class FileService {
         File fileDTO = new File();
 
         try {
-            BufferedImage originalImage = ImageIO.read(multipartFile.getInputStream());
-            int width = originalImage.getWidth();
-            int height = originalImage.getHeight();
-
-            // Obliczenie wysokości na podstawie proporcji
-            int scaledWidth = maxWidth;
-            int scaledHeight = (int) ((float) height / width * maxWidth);
-
-            // Przeskalowanie obrazu
-            BufferedImage resizedImage = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_RGB);
-            resizedImage.createGraphics().drawImage(originalImage.getScaledInstance(scaledWidth, scaledHeight, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
-
-            // Konwersja obrazu do tablicy bajtów z uwzględnieniem jakości
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            String format = Objects.requireNonNull(multipartFile.getContentType()).split("/")[1];
-            ImageIO.write(resizedImage, format, baos);
-            byte[] imageBytes = baos.toByteArray();
-
-            //Zapisanie obrazu w bazie danych
+        BufferedImage originalImage = ImageIO.read(multipartFile.getInputStream());
 
 
             fileDTO.setFilename(multipartFile.getOriginalFilename());
-            fileDTO.setData(imageBytes);
+            fileDTO.setWidth(originalImage.getWidth());
+            fileDTO.setHeight(originalImage.getHeight());
+            fileDTO.setData(multipartFile.getBytes());
             fileDTO.setSize(multipartFile.getSize());
             fileDTO.setType(multipartFile.getContentType());
             fileDTO.setCreatedAt(String.valueOf(LocalDateTime.now()));
@@ -143,17 +128,17 @@ public class FileService {
             throw new GlobalExceptionMessage("Error: " + ex.getMessage());
         }
 
-        ChatMessageWithFileDTO chatMessageWithFileDTO = new ChatMessageWithFileDTO();
+        FileWithMessageDTO fileWithMessageDTO = new FileWithMessageDTO();
 
-        chatMessageWithFileDTO.setRoomId(roomId);
-        chatMessageWithFileDTO.setUserId(user.getId());
-        chatMessageWithFileDTO.setMessage(message);
-        chatMessageWithFileDTO.setFile(savedFile);
+        fileWithMessageDTO.setRoomId(roomId);
+        fileWithMessageDTO.setUserId(user.getId());
+        fileWithMessageDTO.setMessage(message);
+        fileWithMessageDTO.setFile(savedFile);
 //        chatMessageWithFileDTO.setReplyToId(chatRoomDTO.getReplyToId());
-        chatMessageWithFileDTO.setEdited(false);
-        chatMessageWithFileDTO.setCreatedAt(String.valueOf(LocalDateTime.now()));
+        fileWithMessageDTO.setEdited(false);
+        fileWithMessageDTO.setCreatedAt(String.valueOf(LocalDateTime.now()));
 
-        messagingTemplate.convertAndSend("/topic/room/" + roomId, chatMessageWithFileDTO);
+        messagingTemplate.convertAndSend("/topic/room/" + roomId, fileWithMessageDTO);
 
 //        return
     }

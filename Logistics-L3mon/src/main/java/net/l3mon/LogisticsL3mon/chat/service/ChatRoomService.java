@@ -134,7 +134,8 @@ public class ChatRoomService {
                         chatMessageWithFileDTO.setUserId(chatRoom.getUserId());
                         chatMessageWithFileDTO.setMessage(chatRoom.getMessage());
                         chatMessageWithFileDTO.setFileId(chatRoom.getFileId());
-                        chatMessageWithFileDTO.setFile(file);
+                        chatMessageWithFileDTO.setImageWidth(file.getWidth());
+                        chatMessageWithFileDTO.setImageHeight(file.getHeight());
                         chatMessageWithFileDTO.setReplyToId(chatRoom.getReplyToId());
                         chatMessageWithFileDTO.setEdited(chatRoom.isEdited());
                         chatMessageWithFileDTO.setCreatedAt(chatRoom.getCreatedAt());

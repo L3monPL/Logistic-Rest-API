@@ -27,6 +27,12 @@ public class File {
     @Column(name = "type")
     private String type;
 
+    @Column(name = "width")
+    private int width;
+
+    @Column(name = "height")
+    private int height;
+
     @Column(name = "data", nullable = false)
     private byte[] data;
 

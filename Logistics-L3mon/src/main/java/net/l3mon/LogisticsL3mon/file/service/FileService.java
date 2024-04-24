@@ -82,6 +82,8 @@ public class FileService {
             try {
                 BufferedImage originalImage = ImageIO.read(multipartFile.getInputStream());
 
+                System.out.println(originalImage);
+
                 fileDTO.setFilename(multipartFile.getOriginalFilename());
                 fileDTO.setWidth(originalImage.getWidth());
                 fileDTO.setHeight(originalImage.getHeight());
@@ -93,7 +95,10 @@ public class FileService {
                 e.printStackTrace();
             }
         }
-        if (!isImage(multipartFile)){
+        if (isImageWebp(multipartFile)) {
+            throw new GlobalExceptionMessage("To jest zdjęcie webp/svg");
+        }
+        if (!isFile(multipartFile)){
             try {
 
                 fileDTO.setFilename(multipartFile.getOriginalFilename());
@@ -147,17 +152,28 @@ public class FileService {
 //        return
     }
 
-    public static boolean isImage(MultipartFile file) {
-        // Pobranie MIME type z pliku
-        String contentType = file.getContentType();
+//    public static boolean isImage(MultipartFile file) {
+//        // Pobranie MIME type z pliku
+//        String contentType = file.getContentType();
+//
+//        // Sprawdzenie, czy MIME type wskazuje na obraz
+//        return contentType != null && contentType.startsWith("image");
+//    }
 
-        // Sprawdzenie, czy MIME type wskazuje na obraz
+    public static boolean isImage(MultipartFile file) {
+        String contentType = file.getContentType();
+        return contentType != null && (contentType.equals("image/jpeg") || contentType.equals("image/png") || contentType.equals("image/gif") || contentType.equals("image/bmp"));
+    }
+
+    public static boolean isFile(MultipartFile file) {
+        String contentType = file.getContentType();
         return contentType != null && contentType.startsWith("image");
     }
 
-//    public static boolean isImage(String mimeType) {
-//        return mimeType != null && (mimeType.equals("image/jpeg") || mimeType.equals("image/png") || mimeType.equals("image/gif") || mimeType.equals("image/bmp") || mimeType.equals("image/svg"));
-//    }
+    public static boolean isImageWebp(MultipartFile file) {
+        String contentType = file.getContentType();
+        return contentType != null && (contentType.equals("image/webp") || contentType.equals("image/svg"));
+    }
 
     public File getFileById(Long fileId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

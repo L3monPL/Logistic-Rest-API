@@ -44,12 +44,9 @@ public class FileService {
     }
     public void uploadFile(Long roomId, MultipartFile multipartFile, String message, SimpMessagingTemplate messagingTemplate) throws GlobalExceptionMessage, IOException {
 
-//        if (isNullOrEmpty(companyDTO.getName())) {
-//            throw new GlobalExceptionMessage("Nazwa firmy nie może być pusta");
-//        }
-//        if (isNullOrEmpty(companyDTO.getShortName())) {
-//            throw new GlobalExceptionMessage("Skrócona nazwa firmy nie może być pusta");
-//        }
+        if (multipartFile.getSize() > 20 * 1024 * 1024) { // Sprawdź rozmiar pliku
+            throw new GlobalExceptionMessage("File exceeding the 20MB limit");
+        }
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();

@@ -17,6 +17,8 @@ public class ChatMessageWithFileDTO {
     private Long userId;
     private String message;
     private Long fileId;
+    private String type;
+    private String fileName;
     private int imageWidth;
     private int imageHeight;
     private Long replyToId;

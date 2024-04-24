@@ -109,16 +109,6 @@ public class FileService {
             }
         }
 
-
-
-//        File fileDTO = new File();
-//
-//        fileDTO.setFilename(multipartFile.getOriginalFilename());
-//        fileDTO.setData(multipartFile.getBytes());
-//        fileDTO.setSize(multipartFile.getSize());
-//        fileDTO.setType(multipartFile.getContentType());
-//        fileDTO.setCreatedAt(String.valueOf(LocalDateTime.now()));
-
         File savedFile;
         try {
             savedFile = fileRepository.save(fileDTO);
@@ -149,6 +139,8 @@ public class FileService {
         chatMessageWithFileDTO.setFileId(savedFile.getId());
         chatMessageWithFileDTO.setImageWidth(savedFile.getWidth());
         chatMessageWithFileDTO.setImageHeight(savedFile.getHeight());
+        chatMessageWithFileDTO.setType(savedFile.getType());
+        chatMessageWithFileDTO.setFileName(savedFile.getFilename());
 //        chatMessageWithFileDTO.setReplyToId(chatRoomDTO.getReplyToId());
         chatMessageWithFileDTO.setEdited(false);
         chatMessageWithFileDTO.setCreatedAt(String.valueOf(LocalDateTime.now()));

@@ -134,6 +134,8 @@ public class ChatRoomService {
                         chatMessageWithFileDTO.setFileId(chatRoom.getFileId());
                         chatMessageWithFileDTO.setImageWidth(file.getWidth());
                         chatMessageWithFileDTO.setImageHeight(file.getHeight());
+                        chatMessageWithFileDTO.setType(file.getType());
+                        chatMessageWithFileDTO.setFileName(file.getFilename());
                         chatMessageWithFileDTO.setReplyToId(chatRoom.getReplyToId());
                         chatMessageWithFileDTO.setEdited(chatRoom.isEdited());
                         chatMessageWithFileDTO.setCreatedAt(chatRoom.getCreatedAt());
@@ -149,8 +151,10 @@ public class ChatRoomService {
                         chatMessageWithFileDTO.setUserId(chatRoom.getUserId());
                         chatMessageWithFileDTO.setMessage(chatRoom.getMessage());
                         chatMessageWithFileDTO.setFileId(chatRoom.getFileId());
-//                        chatMessageWithFileDTO.setImageWidth(file.getWidth());
-//                        chatMessageWithFileDTO.setImageHeight(file.getHeight());
+                        chatMessageWithFileDTO.setImageWidth(file.getWidth());
+                        chatMessageWithFileDTO.setImageHeight(file.getHeight());
+                        chatMessageWithFileDTO.setType(file.getType());
+                        chatMessageWithFileDTO.setFileName(file.getFilename());
                         chatMessageWithFileDTO.setReplyToId(chatRoom.getReplyToId());
                         chatMessageWithFileDTO.setEdited(chatRoom.isEdited());
                         chatMessageWithFileDTO.setCreatedAt(chatRoom.getCreatedAt());
